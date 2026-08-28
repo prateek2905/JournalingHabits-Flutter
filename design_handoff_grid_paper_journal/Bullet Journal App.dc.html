@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Kalam:wght@300;400;700&display=swap">
+<style>
+body{margin:0;background:#90a08c}
+a{color:#8a6b12;text-decoration:none}
+a:hover{color:#5c470a}
+@keyframes inkIn{from{opacity:0;transform:scale(.4) rotate(-14deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+::-webkit-scrollbar{width:0;height:0}
+</style>
+</helmet>
+<div data-app style="{{ themeVars }}">
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:44px 20px;box-sizing:border-box;background:radial-gradient(120% 90% at 50% 0%, var(--room1) 0%, var(--room2) 70%, var(--room3) 100%)">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ darkMode }}" hint-size="402px,874px">
+
+<div style="height:100%;display:flex;flex-direction:column;background:linear-gradient(180deg,var(--paper1),var(--paper2));font-family:Kalam, cursive;color:var(--ink)">
+
+  <div style="flex:1;overflow:auto">
+  <div style="min-height:100%;padding:40px 20px 20px;box-sizing:border-box;background-image:repeating-linear-gradient(to right, var(--grid) 0 1px, transparent 1px 20px), repeating-linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px 20px);background-position:0 0;background-repeat:repeat">
+
+  <div style="height:80px;display:flex;align-items:flex-end;justify-content:space-between;gap:6px;padding-bottom:0">
+    <div>
+      <div style="display:inline-block">
+        <div style="font-family:Caveat, cursive;font-size:34px;line-height:40px;letter-spacing:.5px;font-weight:700;text-transform:uppercase;white-space:nowrap">{{ monthLabel }}</div>
+        <div style="height:2px;background:var(--ink);transform:rotate(-.5deg)"></div>
+      </div>
+      <div style="font-size:12px;line-height:20px;opacity:.6;text-transform:uppercase;letter-spacing:.4px">{{ monthNote }}</div>
+    </div>
+    <div style="display:flex;gap:4px;align-items:center;width:60px;height:40px;flex:none">
+      <div onClick="{{ prevMonth }}" style="width:28px;height:40px;border:2px solid var(--ink);border-radius:14px 4px 13px 5px;display:flex;align-items:center;justify-content:center;font-family:Caveat, cursive;font-size:22px;line-height:1;cursor:pointer;user-select:none;padding-bottom:3px;box-sizing:border-box" style-hover="background:var(--hi)">&lt;</div>
+      <div onClick="{{ nextMonth }}" style="width:28px;height:40px;border:2px solid var(--ink);border-radius:5px 13px 4px 14px;display:flex;align-items:center;justify-content:center;font-family:Caveat, cursive;font-size:22px;line-height:1;cursor:pointer;user-select:none;padding-bottom:3px;box-sizing:border-box;opacity:{{ nextOpacity }}" style-hover="background:var(--hi)">&gt;</div>
+    </div>
+  </div>
+
+
+    <sc-if value="{{ isJournal }}" hint-placeholder-val="{{ true }}">
+    <div>
+      <div style="height:40px;display:flex;align-items:flex-end;gap:8px">
+        <div style="font-size:17px;line-height:20px;text-transform:uppercase;letter-spacing:1.2px;border-bottom:2px solid var(--ink);white-space:nowrap">tasks</div>
+        <div style="font-size:12px;line-height:20px;opacity:.55;text-transform:uppercase;white-space:nowrap">{{ taskOpen }} open · tap to cross off</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column">
+        <sc-for list="{{ dayTasks }}" as="t" hint-placeholder-count="4">
+          <div onClick="{{ t.toggle }}" style="display:flex;gap:8px;align-items:flex-start;cursor:pointer;user-select:none" style-hover="background:var(--hiSoft)">
+            <div style="width:20px;flex:none;text-align:center;font-size:15px;line-height:20px">{{ t.mark }}</div>
+            <sc-if value="{{ t.done }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:14px;line-height:20px;text-transform:uppercase;letter-spacing:.2px;text-decoration:line-through;text-decoration-thickness:2px;opacity:.42">{{ t.text }}</div>
+            </sc-if>
+            <sc-if value="{{ t.open }}" hint-placeholder-val="{{ true }}">
+              <div style="font-size:14px;line-height:20px;text-transform:uppercase;letter-spacing:.2px">{{ t.text }}</div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ noTasks }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:13px;line-height:20px;text-transform:uppercase;opacity:.4;padding-left:28px">nothing on the list for this day</div>
+      </sc-if>
+
+      <div style="display:flex;gap:8px;align-items:center;height:20px;margin-top:20px">
+        <div style="width:20px;flex:none;text-align:center;font-size:15px;line-height:20px;opacity:.4">□</div>
+        <input value="{{ taskDraft }}" onChange="{{ onTaskDraft }}" onKeyDown="{{ onTaskKey }}" placeholder="add a task…" style="flex:1;min-width:0;height:20px;background:transparent;border:none;border-bottom:2px solid var(--ink50);outline:none;font-family:Kalam, cursive;font-size:14px;line-height:20px;text-transform:uppercase;letter-spacing:.2px;padding:0;color:var(--ink)">
+        <div onClick="{{ addTask }}" style="flex:none;border:1.5px solid var(--ink);border-radius:12px 9px 11px 10px;height:20px;padding:0 9px;font-size:13px;line-height:18px;cursor:pointer;text-transform:uppercase" style-hover="background:var(--hi)">add</div>
+      </div>
+
+      <div style="height:40px;display:flex;align-items:flex-end;gap:8px;padding-top:20px;box-sizing:content-box">
+        <div style="font-size:17px;line-height:20px;text-transform:uppercase;letter-spacing:1.2px;border-bottom:2px solid var(--ink);white-space:nowrap">memorable moments</div>
+        <div style="font-size:12px;line-height:20px;opacity:.55;text-transform:uppercase;white-space:nowrap">{{ momentCount }}</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column">
+        <sc-for list="{{ dayEntries }}" as="e" hint-placeholder-count="2">
+          <div onMouseDown="{{ e.hold }}" onMouseUp="{{ e.release }}" onMouseLeave="{{ e.release }}" onTouchStart="{{ e.hold }}" onTouchEnd="{{ e.release }}" style="display:flex;gap:8px;align-items:flex-start;cursor:pointer;user-select:none" style-hover="background:var(--hiSoft)">
+            <div style="font-size:15px;line-height:20px;width:20px;text-align:center;flex:none;opacity:.45">·</div>
+            <div style="font-size:14px;line-height:20px;text-transform:uppercase;letter-spacing:.2px">{{ e.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ noMoments }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:13px;line-height:20px;text-transform:uppercase;opacity:.4;padding-left:28px">no moment written yet</div>
+      </sc-if>
+
+      <div style="display:flex;gap:8px;align-items:center;height:40px;padding-top:20px;box-sizing:content-box">
+        <div style="font-size:15px;line-height:20px;width:20px;text-align:center;flex:none;opacity:.45">+</div>
+        <input value="{{ draft }}" onChange="{{ onDraft }}" onKeyDown="{{ onDraftKey }}" placeholder="write a moment…" style="flex:1;min-width:0;height:20px;background:transparent;border:none;border-bottom:2px solid var(--ink50);outline:none;font-family:Kalam, cursive;font-size:14px;line-height:20px;text-transform:uppercase;letter-spacing:.2px;padding:0;color:var(--ink)">
+        <div onClick="{{ addEntry }}" style="flex:none;border:1.5px solid var(--ink);border-radius:10px 12px 9px 11px;height:20px;padding:0 9px;font-size:13px;line-height:18px;cursor:pointer;text-transform:uppercase" style-hover="background:var(--hi)">add</div>
+      </div>
+
+      <div style="margin-top:20px;border-top:2px solid var(--ink40)">
+        <div style="font-size:13px;line-height:20px;text-transform:uppercase;letter-spacing:1px;opacity:.6">{{ monthIntentLabel }}</div>
+        <div style="font-size:14px;line-height:20px;text-transform:uppercase">alone time, no social media on waking, one long run</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isHabits }}" hint-placeholder-val="{{ false }}">
+    <div>
+      <div style="height:40px;display:flex;align-items:flex-end;gap:8px">
+        <div style="font-size:17px;line-height:20px;text-transform:uppercase;letter-spacing:1.2px;border-bottom:2px solid var(--ink)">habit tracker</div>
+        <div style="font-size:12px;line-height:20px;opacity:.55;text-transform:uppercase;white-space:nowrap">tap to X</div>
+      </div>
+
+      <div style="overflow-x:auto">
+        <div style="display:inline-block;min-width:100%">
+
+          <div style="display:flex;align-items:flex-end;height:120px">
+            <div style="width:20px;flex:none"></div>
+            <div style="width:40px;flex:none;height:120px;display:flex;align-items:flex-end;justify-content:center">
+              <div style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:11px;letter-spacing:.6px;text-transform:uppercase;white-space:nowrap">weight kg</div>
+            </div>
+            <sc-for list="{{ habitCols }}" as="h" hint-placeholder-count="10">
+              <div style="width:20px;flex:none;height:120px;display:flex;align-items:flex-end;justify-content:center">
+                <div style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:11px;letter-spacing:.4px;text-transform:uppercase;white-space:nowrap;overflow:hidden;max-height:120px">{{ h.name }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:flex;flex-direction:column;position:relative;box-shadow:inset 0 2px 0 var(--ink65)">
+            <sc-for list="{{ dayRows }}" as="r" hint-placeholder-count="31">
+              <div style="display:flex;align-items:stretch;height:20px">
+                <div style="width:20px;flex:none;display:flex;align-items:center;justify-content:flex-end;padding-right:3px;box-sizing:border-box;font-size:11px;opacity:.65">{{ r.day }}</div>
+                <div style="width:40px;flex:none;display:flex;align-items:center;justify-content:center;font-size:11px;border-left:2px solid var(--ink50);border-right:2px solid var(--ink50);box-sizing:border-box">{{ r.weight }}</div>
+                <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="10">
+                  <div onClick="{{ c.toggle }}" style="width:20px;flex:none;display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:var(--hiFill)">
+                    <span style="font-size:16px;line-height:1;animation:inkIn .18s ease-out">{{ c.mark }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+
+            <div style="display:flex;align-items:stretch;height:20px;box-shadow:inset 0 2px 0 var(--ink65)">
+              <div style="width:20px;flex:none"></div>
+              <div style="width:40px;flex:none;display:flex;align-items:center;justify-content:center;font-size:10px;opacity:.55;text-transform:uppercase;box-sizing:border-box;border-left:2px solid var(--ink50);border-right:2px solid var(--ink50)">total</div>
+              <sc-for list="{{ habitCols }}" as="h" hint-placeholder-count="10">
+                <div style="width:20px;flex:none;display:flex;align-items:center;justify-content:center;font-size:12px">{{ h.total }}</div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;height:40px;padding-top:20px">
+        <input value="{{ habitDraft }}" onChange="{{ onHabitDraft }}" onKeyDown="{{ onHabitKey }}" placeholder="new habit…" style="flex:1;min-width:120px;height:20px;background:transparent;border:none;border-bottom:2px solid var(--ink50);outline:none;font-family:Kalam, cursive;font-size:14px;line-height:20px;text-transform:uppercase;padding:0;color:var(--ink)">
+        <div onClick="{{ addHabit }}" style="border:1.5px solid var(--ink);border-radius:11px 9px 12px 10px;height:20px;padding:0 10px;font-size:13px;line-height:18px;cursor:pointer;text-transform:uppercase" style-hover="background:var(--hi)">+ habit</div>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;padding-top:20px">
+        <div style="border:1.5px solid var(--ink);border-radius:13px 10px 14px 11px;height:20px;padding:0 10px;font-size:13px;line-height:18px;text-transform:uppercase;background:var(--hiFill);transform:rotate(-.7deg)">{{ totalMarks }} X's this month</div>
+        <div style="border:1.5px solid var(--ink);border-radius:10px 14px 11px 13px;height:20px;padding:0 10px;font-size:13px;line-height:18px;text-transform:uppercase;transform:rotate(.6deg)">best streak {{ bestStreak }} days</div>
+        <div style="border:1.5px solid var(--ink);border-radius:14px 11px 13px 10px;height:20px;padding:0 10px;font-size:13px;line-height:18px;text-transform:uppercase;transform:rotate(-.4deg)">today {{ todayCount }}/{{ habitCount }} done</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+    <div>
+      <div style="height:40px;display:flex;align-items:flex-end;gap:8px">
+        <div style="font-size:17px;line-height:20px;text-transform:uppercase;letter-spacing:1.2px;border-bottom:2px solid var(--ink)">me</div>
+        <div style="font-size:12px;line-height:20px;opacity:.55;text-transform:uppercase;white-space:nowrap">since june 2025</div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:flex-end;height:80px">
+        <div style="width:60px;height:60px;flex:none;border:2px solid var(--ink);border-radius:50%;overflow:hidden;position:relative;background:var(--hiSoft)">
+          <div style="position:absolute;left:50%;top:12px;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:var(--ink)"></div>
+          <div style="position:absolute;left:50%;top:36px;width:38px;height:32px;margin-left:-19px;border-radius:19px 19px 0 0;background:var(--ink)"></div>
+        </div>
+        <div>
+          <div style="font-family:Caveat, cursive;font-size:28px;line-height:40px;font-weight:700;text-transform:uppercase">sam k.</div>
+          <div style="font-size:13px;line-height:20px;text-transform:uppercase;opacity:.65">14 notebooks · 428 entries</div>
+        </div>
+      </div>
+
+      <div style="padding-top:20px">
+        <sc-for list="{{ profileRows }}" as="p" hint-placeholder-count="5">
+          <div style="display:flex;height:20px;align-items:center;gap:8px">
+            <div style="font-size:14px;line-height:20px;text-transform:uppercase;letter-spacing:.2px">{{ p.label }}</div>
+            <div style="flex:1;border-bottom:1px dotted var(--ink30);height:14px"></div>
+            <div style="font-size:14px;line-height:20px;text-transform:uppercase">{{ p.value }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="padding-top:20px;display:flex;flex-direction:column">
+        <div style="font-size:13px;line-height:20px;text-transform:uppercase;letter-spacing:1px;opacity:.6">settings</div>
+        <div onClick="{{ toggleDark }}" style="display:flex;height:20px;align-items:center;gap:8px;cursor:pointer;user-select:none" style-hover="background:var(--hiSoft)">
+          <div style="width:20px;flex:none;display:flex;align-items:center;justify-content:center">
+            <div style="width:32px;height:14px;border:1.5px solid var(--ink);border-radius:8px;display:flex;align-items:center;padding:0 1px;box-sizing:border-box">
+              <sc-if value="{{ darkOff }}" hint-placeholder-val="{{ true }}">
+                <div style="width:9px;height:9px;border-radius:50%;background:var(--ink)"></div>
+              </sc-if>
+              <sc-if value="{{ darkMode }}" hint-placeholder-val="{{ false }}">
+                <div style="width:9px;height:9px;border-radius:50%;background:var(--hi);margin-left:18px"></div>
+              </sc-if>
+            </div>
+          </div>
+          <div style="font-size:14px;line-height:20px;text-transform:uppercase;padding-left:16px">{{ darkLabel }}</div>
+        </div>
+        <sc-for list="{{ settings }}" as="s2" hint-placeholder-count="4">
+          <div onClick="{{ s2.toggle }}" style="display:flex;height:20px;align-items:center;gap:8px;cursor:pointer" style-hover="background:var(--hiSoft)">
+            <div style="width:20px;flex:none;text-align:center;font-size:15px;line-height:20px">{{ s2.mark }}</div>
+            <div style="font-size:14px;line-height:20px;text-transform:uppercase">{{ s2.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="margin-top:20px;border:1.5px solid var(--ink);border-radius:14px 11px 15px 12px;height:40px;padding:0 12px;background:var(--hiFill);transform:rotate(.5deg)">
+        <div style="font-size:14px;line-height:20px;text-transform:uppercase">export august as pdf</div>
+        <div style="font-size:12px;line-height:18px;opacity:.7;text-transform:uppercase">prints on grid paper, 1:1</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isSleep }}" hint-placeholder-val="{{ false }}">
+    <div>
+      <div style="height:40px;display:flex;align-items:flex-end;gap:8px">
+        <div style="font-size:17px;line-height:20px;text-transform:uppercase;letter-spacing:1.2px;border-bottom:2px solid var(--ink)">sleep</div>
+        <div style="font-size:12px;line-height:20px;opacity:.55;text-transform:uppercase;white-space:nowrap">avg {{ avgSleep }}h</div>
+      </div>
+
+      <div style="display:flex;height:20px;align-items:center">
+        <div style="width:20px;flex:none"></div>
+        <div style="width:280px;flex:none;position:relative;height:20px;font-size:10px;opacity:.6">
+          <sc-for list="{{ hourTicks }}" as="h" hint-placeholder-count="7">
+            <div style="position:absolute;top:0;line-height:20px;left:{{ h.left }};transform:translateX(-50%)">{{ h.label }}</div>
+          </sc-for>
+        </div>
+        <div style="width:40px;flex:none;font-size:10px;opacity:.6;text-align:right;text-transform:uppercase">score</div>
+      </div>
+
+      <div style="display:flex">
+        <div style="width:20px;flex:none;display:flex;flex-direction:column">
+          <sc-for list="{{ nights }}" as="n" hint-placeholder-count="28">
+            <div style="height:20px;font-size:10px;opacity:.6;display:flex;align-items:center">{{ n.day }}</div>
+          </sc-for>
+        </div>
+        <div style="width:280px;flex:none;box-shadow:inset 2px 0 0 var(--ink60), inset -2px 0 0 var(--ink50);position:relative">
+          <svg width="100%" height="{{ chartH }}" viewBox="{{ chartVB }}" preserveAspectRatio="none" style="display:block">
+            <polyline points="{{ sleepPath }}" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"></polyline>
+          </svg>
+          <sc-for list="{{ nights }}" as="n" hint-placeholder-count="28">
+            <div onClick="{{ n.select }}" style="position:absolute;left:0;right:0;height:20px;top:{{ n.top }};cursor:pointer" style-hover="background:var(--hiSoft)">
+              <div style="position:absolute;left:{{ n.left }};top:6px;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:var(--ink)"></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="width:40px;flex:none;display:flex;flex-direction:column;align-items:flex-end">
+          <sc-for list="{{ nights }}" as="n" hint-placeholder-count="28">
+            <div style="height:20px;font-size:11px;opacity:.75;display:flex;align-items:center">{{ n.score }}</div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;border:1.5px solid var(--ink);border-radius:14px 11px 15px 12px;height:40px;padding:0 12px;background:var(--hiFill);transform:rotate(-.6deg)">
+        <div style="font-size:14px;line-height:20px;text-transform:uppercase;letter-spacing:.4px">{{ selLabel }}</div>
+        <div style="font-size:12px;line-height:18px;opacity:.75;text-transform:uppercase">{{ selNote }}</div>
+      </div>
+    </div>
+    </sc-if>
+
+  </div>
+  </div>
+
+  <div style="flex:none;display:flex;padding:6px 12px 30px;gap:6px;border-top:2px solid var(--ink50);background:linear-gradient(180deg,var(--barA),var(--barB))">
+    <div onClick="{{ goJournal }}" style="flex:1;text-align:center;padding:7px 2px 8px;cursor:pointer;position:relative;font-size:14px;text-transform:uppercase;letter-spacing:.6px">
+      <sc-if value="{{ isJournal }}" hint-placeholder-val="{{ true }}">
+        <div style="position:absolute;left:8px;right:8px;top:9px;height:17px;background:var(--hi);border-radius:3px 6px 4px 7px;transform:rotate(-1deg)"></div>
+        <span style="position:relative;color:var(--onHi);font-weight:700">journal</span>
+      </sc-if>
+      <sc-if value="{{ notJournal }}" hint-placeholder-val="{{ false }}">
+        <span style="position:relative">journal</span>
+      </sc-if>
+    </div>
+    <div onClick="{{ goHabits }}" style="flex:1;text-align:center;padding:7px 2px 8px;cursor:pointer;position:relative;font-size:14px;text-transform:uppercase;letter-spacing:.6px">
+      <sc-if value="{{ isHabits }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:8px;right:8px;top:9px;height:17px;background:var(--hi);border-radius:6px 3px 7px 4px;transform:rotate(.8deg)"></div>
+        <span style="position:relative;color:var(--onHi);font-weight:700">habits</span>
+      </sc-if>
+      <sc-if value="{{ notHabits }}" hint-placeholder-val="{{ false }}">
+        <span style="position:relative">habits</span>
+      </sc-if>
+    </div>
+    <div onClick="{{ goSleep }}" style="flex:1;text-align:center;padding:7px 2px 8px;cursor:pointer;position:relative;font-size:14px;text-transform:uppercase;letter-spacing:.6px">
+      <sc-if value="{{ isSleep }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:8px;right:8px;top:9px;height:17px;background:var(--hi);border-radius:4px 7px 3px 6px;transform:rotate(-.6deg)"></div>
+        <span style="position:relative;color:var(--onHi);font-weight:700">sleep</span>
+      </sc-if>
+      <sc-if value="{{ notSleep }}" hint-placeholder-val="{{ false }}">
+        <span style="position:relative">sleep</span>
+      </sc-if>
+    </div>
+    <div onClick="{{ goProfile }}" style="width:44px;flex:none;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative">
+      <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:4px;right:4px;top:6px;height:24px;background:var(--hi);border-radius:5px 8px 4px 7px;transform:rotate(-1.4deg)"></div>
+      </sc-if>
+      <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+        <div style="position:relative;width:24px;height:24px;border:1.8px solid var(--onHi);border-radius:50%;overflow:hidden">
+          <div style="position:absolute;left:50%;top:4px;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:var(--onHi)"></div>
+          <div style="position:absolute;left:50%;top:15px;width:16px;height:12px;margin-left:-8px;border-radius:8px 8px 0 0;background:var(--onHi)"></div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ notProfile }}" hint-placeholder-val="{{ true }}">
+        <div style="position:relative;width:24px;height:24px;border:1.8px solid var(--ink);border-radius:50%;overflow:hidden">
+          <div style="position:absolute;left:50%;top:4px;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:var(--ink)"></div>
+          <div style="position:absolute;left:50%;top:15px;width:16px;height:12px;margin-left:-8px;border-radius:8px 8px 0 0;background:var(--ink)"></div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+</div>
+</x-import>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:500,&quot;height&quot;:980}}">
+const NAMES = ["JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE","JULY","AUGUST","SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"];
+const MONTHS = [];
+for (let y = 2025, m = 6; !(y === 2026 && m === 9); m === 12 ? (m = 1, y++) : m++) {
+  MONTHS.push({ y: y, m: m, label: NAMES[m - 1] + " " + y, short: NAMES[m - 1].slice(0, 3), days: new Date(y, m, 0).getDate() });
+}
+const CUR = MONTHS.length - 1, TODAY = 28;
+const WD = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+const QUOTES = ["LETS FKN GO", "CARRY THE BOATS", "DON'T BE SOFT", "NO ZERO DAYS", "EARN THE SHOWER", "SHOW UP ANYWAY", "STAY HARD", "BE UNREASONABLE", "PAIN IS DATA", "DO IT TIRED", "ONE MORE REP", "GET AFTER IT"];
+
+const HABITS = ["COLD EXPOSURE","EXERCISE","STRETCHING","NO PHONE AM","MEDITATION","READ 5 PAGES","FLOSS TEETH","JOURNAL","COFFEE","SAUNA"];
+const MARKS = ["\u2715","\u00d7","\u2717"];
+
+const MOMENTS = [
+  "MORNING COFFEE W/ MATES + A NEW MATE","FILMED 5.5KM RUN THEN GYM","COFFEE W/ WILBA, LEARNING 3D",
+  "BRAND EVENT, CHATTING, NETWORKING","HUGE FILMING DAY WITH THE CREW","HIT A MILLION VIEWS FIRST TIME",
+  "LONG WALK, NO PHONE, GOOD THINKING","KARAOKE NIGHT FOR MAL'S 22ND","10K FOLLOWERS + COFFEE MEETING",
+  "19KM AROUND THE TRACK","LOTS OF IDEAS + CHAT ABOUT THE FUTURE","PICKUP W/ HAYESY, LOVELY DRIVE + SUNSET",
+  "SUNRISE SWIM, SUNSET STOP OFF","CHEEKY FILMING SESSION -> FUN VIDEO","RAN 46KM",
+  "TOOK THE DAY A LOT SLOWER THAN USUAL","PENNY NECKLACE FOR THE BOYS","4AM 15KM BEFORE THE SUN CAME UP",
+  "UNEXPECTED PHONE CALL W/ INDIA","CHATS OVER COFFEE","FAMILY DINNER -> ITALIAN PLACE",
+  "MOVIE NIGHT, COSY VIBES","LATE NIGHT CALL WITH THE BOYS","SANDWICH THAT CHANGED MY WEEK",
+  "RUN W/ LAV","STEAK LAD EXPERIENCE, WOW","EDITING IN A TRANCE, AWESOME VIDEO","RUN CLUB THEN IN-PERSON MEETING",
+];
+const POOL = [
+  "EASY RUN BEFORE WORK","COFFEE + LONG CHAT","BEACH SWIM, FREEZING","FINISHED A GOOD BOOK",
+  "DINNER AT MUM'S","SAW THE SUNRISE","GYM PB ON DEADLIFT","EDITED ALL AFTERNOON",
+  "WALK WITH NO PHONE","MATES OVER FOR CARDS","SLEPT 9 HOURS, GLORIOUS","MARKET THEN BAKED BREAD",
+];
+const TASK_POOL = ["SORT THE TAX RECEIPTS","BOOK THE DENTIST","REPLY TO THE EDITOR","FIX THE BIKE BRAKES","CALL NAN","RENEW THE GYM PASS"];
+
+const THEME_LIGHT = {
+  "--paper1": "#faf4e3", "--paper2": "#f2ead4", "--barA": "rgba(250,244,227,.5)", "--barB": "rgba(242,234,212,.95)",
+  "--ink": "#23241f", "--ink65": "rgba(35,36,31,.65)", "--ink60": "rgba(35,36,31,.6)", "--ink50": "rgba(35,36,31,.5)",
+  "--ink40": "rgba(35,36,31,.4)", "--ink30": "rgba(35,36,31,.3)", "--grid": "rgba(96,98,72,.2)",
+  "--hi": "#b6ff2e", "--hiFill": "rgba(182,255,46,.4)", "--hiSoft": "rgba(182,255,46,.26)",
+  "--room1": "#adbba6", "--room2": "#90a08c", "--room3": "#7f8f7c", "--onHi": "#23241f",
+};
+const THEME_DARK = {
+  "--paper1": "#24261f", "--paper2": "#191b16", "--barA": "rgba(36,38,31,.6)", "--barB": "rgba(25,27,22,.95)",
+  "--ink": "#f0ead6", "--ink65": "rgba(240,234,214,.62)", "--ink60": "rgba(240,234,214,.55)", "--ink50": "rgba(240,234,214,.45)",
+  "--ink40": "rgba(240,234,214,.35)", "--ink30": "rgba(240,234,214,.25)", "--grid": "rgba(214,226,178,.16)",
+  "--hi": "#b6ff2e", "--hiFill": "rgba(182,255,46,.28)", "--hiSoft": "rgba(182,255,46,.16)",
+  "--room1": "#3c463a", "--room2": "#2b322a", "--room3": "#222820", "--onHi": "#1b1d17",
+};
+
+function rnd(a, b) { const x = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453; return x - Math.floor(x); }
+
+function makeMonth(mi) {
+  const M = MONTHS[mi], last = mi === CUR ? TODAY : M.days, seed = mi + 3;
+  const grid = {};
+  HABITS.forEach((hb, hix) => { for (let d = 1; d <= last; d++) if (rnd(hix + seed, d * seed) > 0.42) grid[hix + ":" + d] = true; });
+  const nights = [];
+  for (let d = 1; d <= last; d++) {
+    const hrs = Math.round((5.6 + rnd(d * seed, 7) * 3.4) * 10) / 10;
+    nights.push({ day: d, hrs: hrs, score: Math.min(99, Math.max(41, Math.round(52 + (hrs - 5) * 11 + rnd(d, seed) * 8))) });
+  }
+  let entries;
+  if (mi === CUR) entries = MOMENTS.map((t, i) => ({ day: i + 1, text: t }));
+  else {
+    entries = [];
+    for (let d = 1; d <= last; d++) if (rnd(d, seed * 2) > 0.45) entries.push({ day: d, text: POOL[(d * 5 + mi * 7) % POOL.length] });
+  }
+  const tasks = [];
+  for (let d = 1; d <= last; d++) {
+    const count = rnd(d, seed * 3) > 0.55 ? 3 : 2;
+    for (let k = 0; k < count; k++) tasks.push({ day: d, text: TASK_POOL[(d * 3 + k * 5 + mi) % TASK_POOL.length], done: d < last ? rnd(d + k, seed) > 0.25 : rnd(d + k, seed) > 0.6 });
+  }
+  if (mi === CUR) {
+    tasks.push({ day: TODAY, text: "EDIT THE 100KM VIDEO", done: false });
+    tasks.push({ day: TODAY, text: "PLAN SEPT TRAINING BLOCK", done: false });
+    tasks.push({ day: TODAY, text: "CALL MUM BACK", done: true });
+  }
+  return { grid: grid, nights: nights, entries: entries, tasks: tasks, last: last };
+}
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const store = MONTHS.map((M, i) => makeMonth(i));
+    this.state = {
+      tab: "journal", jm: CUR, hm: CUR, sm: CUR, pm: CUR, store: store,
+      habits: HABITS.slice(),
+      jd: TODAY, draft: "", taskDraft: "", habitDraft: "", sel: TODAY,
+      flags: [true, true, true, false],
+      dark: false,
+    };
+  }
+
+  key() { return { journal: "jm", habits: "hm", sleep: "sm", profile: "pm" }[this.state.tab]; }
+
+  mi() { return this.state[this.key()]; }
+
+  cur() { return this.state.store[this.mi()]; }
+
+  patch(fn) {
+    const mi = this.mi();
+    this.setState(s => ({ store: s.store.map((mo, i) => i === mi ? Object.assign({}, mo, fn(mo)) : mo) }));
+  }
+
+  go(delta) {
+    const k = this.key();
+    this.setState(s => {
+      const m = Math.max(0, Math.min(MONTHS.length - 1, s[k] + delta));
+      const mo = s.store[m], patch = {};
+      patch[k] = m;
+      if (k === "sm") patch.sel = mo.nights.length ? mo.nights[mo.nights.length - 1].day : 1;
+      return patch;
+    });
+  }
+
+  goDay(delta) {
+    this.setState(s => {
+      let m = s.jm, d = s.jd + delta;
+      if (d < 1) {
+        if (m === 0) return null;
+        m = m - 1; d = s.store[m].last;
+      } else if (d > s.store[m].last) {
+        if (m === MONTHS.length - 1) return null;
+        m = m + 1; d = 1;
+      }
+      return { jm: m, jd: d };
+    });
+  }
+
+  toggleCell(hix, d) {
+    this.patch(mo => {
+      const g = Object.assign({}, mo.grid), k = hix + ":" + d;
+      if (g[k]) delete g[k]; else g[k] = true;
+      return { grid: g };
+    });
+  }
+
+  addEntry = () => {
+    const t = this.state.draft.trim();
+    if (!t) return;
+    const day = this.state.d;
+    this.patch(mo => ({ entries: mo.entries.concat([{ day: day, text: t.toUpperCase() }]) }));
+    this.setState({ draft: "" });
+  };
+
+  addTask = () => {
+    const t = this.state.taskDraft.trim();
+    if (!t) return;
+    const day = this.state.d;
+    this.patch(mo => ({ tasks: mo.tasks.concat([{ day: day, text: t.toUpperCase(), done: false }]) }));
+    this.setState({ taskDraft: "" });
+  };
+
+  addHabit = () => {
+    const t = this.state.habitDraft.trim();
+    if (!t) return;
+    this.setState(s => ({ habits: s.habits.concat([t.toUpperCase()]), habitDraft: "" }));
+  };
+
+  bestStreak() {
+    const mo = this.cur();
+    let best = 0;
+    this.state.habits.forEach((hb, hix) => {
+      let run = 0;
+      for (let d = 1; d <= mo.last; d++) {
+        if (mo.grid[hix + ":" + d]) { run++; if (run > best) best = run; } else run = 0;
+      }
+    });
+    return best;
+  }
+
+  renderVals() {
+    const s = this.state, mi = this.mi(), M = MONTHS[mi], mo = this.cur(), journal = s.tab === "journal";
+    const DAYS = M.days, rowH = 20, W = 100, lo = 4, hi = 10;
+    const x = v => ((Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo)) * (W - 8) + 4;
+
+    const nights = mo.nights.map((n, i) => ({
+      day: n.day, score: n.score,
+      top: i * rowH + "px",
+      left: x(n.hrs) + "%",
+      select: () => this.setState({ sel: n.day }),
+    }));
+    const sel = mo.nights.find(n => n.day === s.sel) || mo.nights[mo.nights.length - 1] || { day: 1, hrs: 0, score: 0 };
+    const avg = mo.nights.length ? (mo.nights.reduce((a, n) => a + n.hrs, 0) / mo.nights.length).toFixed(1) : "0.0";
+
+    return {
+      monthLabel: journal ? WD[new Date(M.y, M.m - 1, s.jd).getDay()] + " " + s.jd + " " + M.short : M.label,
+      monthNote: journal
+        ? M.label + (mi === CUR && s.jd === TODAY ? " \u00b7 today" : "")
+        : (mi === CUR ? "day " + TODAY + " \u00b7 in progress" : "archived \u00b7 " + Object.keys(mo.grid).length + " x's"),
+      prevMonth: journal ? () => this.goDay(-1) : () => this.go(-1),
+      nextMonth: journal ? () => this.goDay(1) : () => this.go(1),
+      nextOpacity: (journal ? (mi === CUR && s.jd === mo.last) : mi === MONTHS.length - 1) ? 0.3 : 1,
+      monthIntentLabel: M.label + " intentions",
+      themeVars: s.dark ? THEME_DARK : THEME_LIGHT,
+      darkMode: s.dark,
+      darkOff: !s.dark,
+      darkLabel: s.dark ? "dark mode \u00b7 on" : "dark mode \u00b7 off",
+      toggleDark: () => this.setState({ dark: !s.dark }),
+      quote: QUOTES[(s.jd * 5 + s.jm * 7) % QUOTES.length],
+
+      dayEntries: mo.entries.map((e, i) => ({ e: e, i: i })).filter(o => o.e.day === s.jd).map(o => ({
+        text: o.e.text,
+        hold: () => {
+          clearTimeout(this._hold);
+          this._hold = setTimeout(() => this.patch(m2 => ({ entries: m2.entries.filter((x2, j) => j !== o.i) })), 550);
+        },
+        release: () => clearTimeout(this._hold),
+      })),
+      noMoments: !mo.entries.some(e => e.day === s.jd),
+      dayTasks: mo.tasks.map((t, i) => ({ t: t, i: i })).filter(o => o.t.day === s.jd).map(o => ({
+        text: o.t.text, done: o.t.done, open: !o.t.done, mark: o.t.done ? "\u2715" : "\u25a1",
+        toggle: () => this.patch(m2 => ({ tasks: m2.tasks.map((x2, j) => j === o.i ? Object.assign({}, x2, { done: !x2.done }) : x2) })),
+      })),
+      noTasks: !mo.tasks.some(t => t.day === s.jd),
+
+      isJournal: s.tab === "journal", isHabits: s.tab === "habits", isSleep: s.tab === "sleep", isProfile: s.tab === "profile",
+      notJournal: s.tab !== "journal", notHabits: s.tab !== "habits", notSleep: s.tab !== "sleep", notProfile: s.tab !== "profile",
+      goJournal: () => this.setState({ tab: "journal" }),
+      goHabits: () => this.setState({ tab: "habits" }),
+      goSleep: () => this.setState({ tab: "sleep" }),
+      goProfile: () => this.setState({ tab: "profile" }),
+
+      profileRows: [
+        { label: "best streak, " + M.short, value: this.bestStreak() + " days" },
+        { label: "x's in " + M.short, value: Object.keys(mo.grid).length },
+        { label: "moments in " + M.short, value: mo.entries.length },
+        { label: "avg sleep, " + M.short, value: avg + "h" },
+        { label: "months kept", value: MONTHS.length },
+      ],
+      settings: ["nightly reminder 9:30pm", "week starts monday", "sync sleep from ring", "show weight column"].map((label, i) => ({
+        label: label,
+        mark: s.flags[i] ? "\u2715" : "",
+        toggle: () => this.setState(st => ({ flags: st.flags.map((f, j) => j === i ? !f : f) })),
+      })),
+
+      entries: mo.entries.map((e, i) => ({
+        day: e.day, text: e.text,
+        hold: () => {
+          clearTimeout(this._hold);
+          this._hold = setTimeout(() => this.patch(m2 => ({ entries: m2.entries.filter((x2, j) => j !== i) })), 550);
+        },
+        release: () => clearTimeout(this._hold),
+      })),
+      momentCount: mo.entries.length + " in " + M.short,
+
+      tasks: mo.tasks.map((t, i) => ({
+        text: t.text, done: t.done, open: !t.done, mark: t.done ? "\u2715" : "\u25a1",
+        toggle: () => this.patch(m2 => ({ tasks: m2.tasks.map((x2, j) => j === i ? Object.assign({}, x2, { done: !x2.done }) : x2) })),
+      })),
+      taskOpen: mo.tasks.filter(t => t.day === s.jd && !t.done).length,
+      taskDraft: s.taskDraft,
+      onTaskDraft: e => this.setState({ taskDraft: e.target.value }),
+      onTaskKey: e => { if (e.key === "Enter") this.addTask(); },
+      addTask: this.addTask,
+      nextDay: mo.entries.length + 1,
+      draft: s.draft,
+      onDraft: e => this.setState({ draft: e.target.value }),
+      onDraftKey: e => { if (e.key === "Enter") this.addEntry(); },
+      addEntry: this.addEntry,
+
+      habitCols: s.habits.map((name, hix) => ({
+        name: name,
+        total: Array.from({ length: DAYS }, (_, j) => mo.grid[hix + ":" + (j + 1)] ? 1 : 0).reduce((a, b) => a + b, 0),
+      })),
+      dayRows: Array.from({ length: DAYS }, (_, j) => {
+        const d = j + 1;
+        return {
+          day: d,
+          weight: d <= mo.last && (d % 3 === 1) ? (83.6 + rnd(d, 11 + mi) * 1.6).toFixed(1) : "\u2014",
+          cells: s.habits.map((name, hix) => ({
+            mark: mo.grid[hix + ":" + d] ? MARKS[(hix + d) % 3] : "",
+            toggle: () => this.toggleCell(hix, d),
+          })),
+        };
+      }),
+      todayCount: s.habits.filter((n, hix) => mo.grid[hix + ":" + mo.last]).length,
+      habitCount: s.habits.length,
+      totalMarks: Object.keys(mo.grid).length,
+      bestStreak: this.bestStreak(),
+      habitDraft: s.habitDraft,
+      onHabitDraft: e => this.setState({ habitDraft: e.target.value }),
+      onHabitKey: e => { if (e.key === "Enter") this.addHabit(); },
+      addHabit: this.addHabit,
+
+      nights: nights,
+      hourTicks: [4, 5, 6, 7, 8, 9, 10].map(v => ({ label: v, left: x(v) + "%" })),
+      chartH: mo.nights.length * rowH,
+      chartVB: "0 0 " + W + " " + (mo.nights.length * rowH),
+      sleepPath: mo.nights.map((n, i) => (x(n.hrs) * W / 100).toFixed(1) + "," + (i * rowH + 10)).join(" "),
+      avgSleep: avg,
+      selLabel: M.short + " " + sel.day + " \u00b7 " + sel.hrs + "H \u00b7 SCORE " + sel.score,
+      selNote: sel.hrs >= 8 ? "SOLID NIGHT. WOKE UP EASY." : sel.hrs >= 7 ? "DECENT. COULD GO TO BED EARLIER." : "SHORT ONE \u2014 LATE EDIT SESSION.",
+    };
+  }
+}
+</script>
+</body>
+</html>

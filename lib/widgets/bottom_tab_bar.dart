@@ -121,19 +121,25 @@ class _TextTab extends StatelessWidget {
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(2, 7, 2, 8),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              if (active)
-                Positioned(
-                  left: 8, right: 8, top: 9, height: 17,
-                  child: Transform.rotate(
-                    angle: rotationDeg * 3.14159265 / 180,
-                    child: DecoratedBox(decoration: BoxDecoration(color: t.hi, borderRadius: markerRadius)),
+          child: SizedBox(
+            // Fixed height so the marker below can be positioned relative to
+            // a known box instead of guessing where the (font-metric
+            // dependent) text glyphs actually land.
+            height: 20,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                if (active)
+                  Positioned(
+                    left: 8, right: 8, top: 1.5, bottom: 1.5,
+                    child: Transform.rotate(
+                      angle: rotationDeg * 3.14159265 / 180,
+                      child: DecoratedBox(decoration: BoxDecoration(color: t.hi, borderRadius: markerRadius)),
+                    ),
                   ),
-                ),
-              Text(label, style: PaperText.tabLabel(active ? t.onHi : t.ink, active: active)),
-            ],
+                Text(label, style: PaperText.tabLabel(active ? t.onHi : t.ink, active: active)),
+              ],
+            ),
           ),
         ),
       ),

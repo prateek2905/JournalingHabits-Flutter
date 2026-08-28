@@ -58,9 +58,10 @@ class PaperText {
         color: color,
       );
 
-  /// Tab label — Kalam 400, 14.
+  /// Tab label — Kalam 400, 14, pinned to a 20px line box.
   static TextStyle tabLabel(Color color, {bool active = false}) => GoogleFonts.kalam(
         fontSize: 14,
+        height: 20 / 14,
         letterSpacing: .6,
         fontWeight: active ? FontWeight.w700 : FontWeight.w400,
         color: color,

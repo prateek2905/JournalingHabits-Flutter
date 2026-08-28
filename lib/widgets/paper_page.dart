@@ -24,9 +24,14 @@ class PaperPage extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
+        // IndexedStack lays every tab out with the same constraints it was
+        // given; guard against an unbounded one reaching us (e.g. from an
+        // ancestor that doesn't itself impose a height) instead of forcing
+        // an infinitely tall — and therefore unscrollable — page.
+        final minHeight = constraints.hasBoundedHeight ? constraints.maxHeight : MediaQuery.of(context).size.height;
         return SingleChildScrollView(
           child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            constraints: BoxConstraints(minHeight: minHeight),
             child: CustomPaint(
               painter: PaperPainter(paper1: t.paper1, paper2: t.paper2, gridColor: t.grid),
               child: Padding(

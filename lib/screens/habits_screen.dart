@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../models/month_cursor.dart';
@@ -159,16 +160,20 @@ class _HabitTable extends StatelessWidget {
                       ),
                     ),
                   ),
-                ...habits.map((name) => SizedBox(
-                      width: _colW,
-                      height: 120,
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: RotatedBox(
-                          quarterTurns: 3,
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 120),
-                            child: Text(name, style: PaperText.small(t.ink, size: 11), overflow: TextOverflow.ellipsis),
+                ...habits.map((name) => GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onLongPress: () => _showCannotDeleteDialog(context, name),
+                      child: SizedBox(
+                        width: _colW,
+                        height: 120,
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: RotatedBox(
+                            quarterTurns: 3,
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 120),
+                              child: Text(name, style: PaperText.small(t.ink, size: 11), overflow: TextOverflow.ellipsis),
+                            ),
                           ),
                         ),
                       ),
@@ -193,6 +198,23 @@ class _HabitTable extends StatelessWidget {
               );
             },
           ),
+        ],
+      ),
+    );
+  }
+
+  void _showCannotDeleteDialog(BuildContext context, String habitName) {
+    HapticFeedback.mediumImpact();
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Nice try.'),
+        content: const Text(
+          "Not going to let you delete a habit just because you couldn't do it and now "
+          "you're deleting it cuz you're ashamed of the commitment you made.",
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
         ],
       ),
     );

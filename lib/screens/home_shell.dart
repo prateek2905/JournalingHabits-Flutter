@@ -17,17 +17,14 @@ class HomeShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final app = context.watch<AppState>();
     return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: IndexedStack(
-          index: app.tab.index,
-          children: const [
-            JournalScreen(),
-            HabitsScreen(),
-            SleepScreen(),
-            ProfileScreen(),
-          ],
-        ),
+      body: IndexedStack(
+        index: app.tab.index,
+        children: const [
+          JournalScreen(),
+          HabitsScreen(),
+          SleepScreen(),
+          ProfileScreen(),
+        ],
       ),
       bottomNavigationBar: BottomTabBar(tab: app.tab, onSelect: app.setTab),
     );

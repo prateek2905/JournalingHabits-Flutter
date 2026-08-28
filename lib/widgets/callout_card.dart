@@ -35,10 +35,14 @@ class CalloutCard extends StatelessWidget {
           height: 40,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           alignment: Alignment.centerLeft,
-          decoration: BoxDecoration(
+          decoration: BoxDecoration(borderRadius: radius, color: t.hiFill),
+          // Border painted via foregroundDecoration, not decoration: a
+          // Border's stroke width otherwise counts as implicit padding
+          // (Container derives padding from decoration.border.dimensions),
+          // shrinking the fixed 40px box and overflowing the two text lines.
+          foregroundDecoration: BoxDecoration(
             border: Border.all(color: t.ink, width: 1.5),
             borderRadius: radius,
-            color: t.hiFill,
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

@@ -40,10 +40,12 @@ class PillButton extends StatelessWidget {
       height: height,
       padding: padding,
       alignment: Alignment.center,
-      decoration: BoxDecoration(
+      decoration: BoxDecoration(borderRadius: radius, color: background),
+      // Border via foregroundDecoration so its stroke width doesn't count as
+      // implicit padding and shrink the fixed-height box (see CalloutCard).
+      foregroundDecoration: BoxDecoration(
         border: Border.all(color: t.ink, width: borderWidth),
         borderRadius: radius,
-        color: background,
       ),
       child: Text(label.toUpperCase(), style: PaperText.button(t.ink)),
     );

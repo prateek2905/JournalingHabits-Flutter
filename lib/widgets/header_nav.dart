@@ -119,10 +119,12 @@ class _NavButtonState extends State<_NavButton> {
           height: 40,
           alignment: Alignment.center,
           padding: const EdgeInsets.only(bottom: 3),
-          decoration: BoxDecoration(
+          decoration: BoxDecoration(borderRadius: widget.radius, color: _pressed ? t.hi : null),
+          // Border via foregroundDecoration so its stroke width doesn't count as
+          // implicit padding and shrink the fixed-size box (see CalloutCard).
+          foregroundDecoration: BoxDecoration(
             border: Border.all(color: t.ink, width: 2),
             borderRadius: widget.radius,
-            color: _pressed ? t.hi : null,
           ),
           child: Text(widget.label, style: PaperText.navArrow(_pressed ? t.onHi : t.ink)),
         ),

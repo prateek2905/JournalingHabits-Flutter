@@ -34,8 +34,6 @@ class MonthCursor implements Comparable<MonthCursor> {
     return MonthCursor(total ~/ 12, total % 12 + 1);
   }
 
-  bool get isSameOrAfter => true;
-
   @override
   int compareTo(MonthCursor other) {
     if (year != other.year) return year.compareTo(other.year);

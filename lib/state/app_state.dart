@@ -168,8 +168,7 @@ class AppState extends ChangeNotifier {
       d = 1;
     }
     final target = MonthCursor(m.year, m.month);
-    final targetWithDay = target;
-    if (targetWithDay > _todayCursor || (targetWithDay == _todayCursor && d > _todayDay)) {
+    if (target > _todayCursor || (target == _todayCursor && d > _todayDay)) {
       return; // capped at today
     }
     journalMonth = target;
@@ -212,7 +211,6 @@ class AppState extends ChangeNotifier {
   }
 
   bool get journalAtToday => journalMonth == _todayCursor && journalDay == _todayDay;
-  bool get journalAtEarliestBoundOfInstall => journalMonth == installMonth && journalDay == 1;
 
   bool monthAtToday(MonthCursor c) => c == _todayCursor;
 

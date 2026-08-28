@@ -134,5 +134,5 @@ class PaperTokens extends ThemeExtension<PaperTokens> {
 }
 
 extension PaperTokensContext on BuildContext {
-  PaperTokens get paper => Theme.of(this).extension<PaperTokens>()!;
+  PaperTokens get paper => Theme.of(this).extension<PaperTokens>() ?? PaperTokens.light;
 }

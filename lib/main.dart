@@ -19,26 +19,24 @@ class JournalingHabitsApp extends StatelessWidget {
       create: (_) => AppState()..init(),
       child: Consumer<AppState>(
         builder: (context, app, _) {
-          if (!app.ready) {
-            return const MaterialApp(
-              debugShowCheckedModeBanner: false,
-              home: Scaffold(body: Center(child: CircularProgressIndicator())),
+          final tokens = app.ready && app.dark ? PaperTokens.dark : PaperTokens.light;
+          if (app.ready) {
+            SystemChrome.setSystemUIOverlayStyle(
+              app.dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
             );
           }
-          final tokens = app.dark ? PaperTokens.dark : PaperTokens.light;
-          SystemChrome.setSystemUIOverlayStyle(
-            app.dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
-          );
           return MaterialApp(
             title: 'Journaling Habits',
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
               useMaterial3: true,
-              brightness: app.dark ? Brightness.dark : Brightness.light,
+              brightness: tokens == PaperTokens.dark ? Brightness.dark : Brightness.light,
               scaffoldBackgroundColor: tokens.paper1,
               extensions: [tokens],
             ),
-            home: const HomeShell(),
+            home: app.ready
+                ? const HomeShell()
+                : Scaffold(backgroundColor: tokens.paper1, body: const Center(child: CircularProgressIndicator())),
           );
         },
       ),

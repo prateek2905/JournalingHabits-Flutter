@@ -314,4 +314,27 @@ class AppState extends ChangeNotifier {
 
   int monthsKept() => months.values.where((m) =>
       m.tasks.isNotEmpty || m.moments.isNotEmpty || m.marks.isNotEmpty || m.nights.isNotEmpty).length;
+
+  /// Read-only month lookup — unlike [monthAt], never creates an entry.
+  /// Safe to call for arbitrary past months while aggregating history.
+  MonthData? monthDataOrNull(MonthCursor c) => months[c.key];
+
+  /// Total X's ever logged, across every month.
+  int allTimeMarksTotal() => months.values.fold(0, (a, m) => a + m.marks.length);
+
+  /// Longest run of consecutive days for one habit, across all months (each
+  /// month's streak resets at the month boundary, same as the per-month
+  /// figure shown on the Habits tab — this just takes the best of those).
+  int allTimeBestStreak(int habitIndex) {
+    var best = 0;
+    months.forEach((key, mo) {
+      final s = mo.bestStreak(habitIndex, MonthCursor.fromKey(key).daysInMonth);
+      if (s > best) best = s;
+    });
+    return best;
+  }
+
+  /// Longest streak of any single habit, across all habits and all months.
+  int allTimeBestStreakOverall() =>
+      habits.asMap().keys.fold(0, (best, i) => allTimeBestStreak(i) > best ? allTimeBestStreak(i) : best);
 }

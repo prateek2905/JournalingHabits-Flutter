@@ -10,6 +10,7 @@ import '../widgets/header_nav.dart';
 import '../widgets/paper_page.dart';
 import '../widgets/profile_icon.dart';
 import '../widgets/section_header.dart';
+import 'progress_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -114,18 +115,30 @@ class ProfileScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 20),
             child: GestureDetector(
-              onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('PDF export is coming in a future update.')),
-              ),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProgressScreen())),
               child: CalloutCard(
                 topMargin: 0,
-                rotationDeg: .5,
-                line1: 'EXPORT ${month.label} AS PDF',
-                line2: 'PRINTS ON GRID PAPER, 1:1',
+                rotationDeg: -.5,
+                line1: 'SEE YOUR PROGRESS',
+                line2: 'STREAKS, CHARTS & TRENDS',
                 radius: const BorderRadius.only(
-                  topLeft: Radius.circular(14), topRight: Radius.circular(11),
-                  bottomRight: Radius.circular(15), bottomLeft: Radius.circular(12),
+                  topLeft: Radius.circular(11), topRight: Radius.circular(14),
+                  bottomRight: Radius.circular(12), bottomLeft: Radius.circular(15),
                 ),
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('PDF export is coming in a future update.')),
+            ),
+            child: CalloutCard(
+              rotationDeg: .5,
+              line1: 'EXPORT ${month.label} AS PDF',
+              line2: 'PRINTS ON GRID PAPER, 1:1',
+              radius: const BorderRadius.only(
+                topLeft: Radius.circular(14), topRight: Radius.circular(11),
+                bottomRight: Radius.circular(15), bottomLeft: Radius.circular(12),
               ),
             ),
           ),

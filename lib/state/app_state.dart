@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart' show Color;
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../models/month_cursor.dart';
@@ -39,6 +40,7 @@ class AppState extends ChangeNotifier {
   int? selectedNightDay;
 
   List<String> habits = List.of(defaultHabits);
+  List<Color?> habitColors = List<Color?>.filled(defaultHabits.length, null, growable: true);
   final Map<String, MonthData> months = {};
 
   bool dark = false;
@@ -78,6 +80,15 @@ class AppState extends ChangeNotifier {
     try {
       final json = jsonDecode(raw as String) as Map<String, dynamic>;
       habits = ((json['habits'] as List?) ?? defaultHabits).cast<String>();
+      habitColors = ((json['habitColors'] as List?) ?? [])
+          .map((v) => v == null ? null : Color(v as int))
+          .toList();
+      while (habitColors.length < habits.length) {
+        habitColors.add(null);
+      }
+      if (habitColors.length > habits.length) {
+        habitColors = habitColors.sublist(0, habits.length);
+      }
       dark = json['dark'] as bool? ?? false;
       settingsFlags = ((json['settingsFlags'] as List?) ?? settingsFlags).cast<bool>();
       userName = json['userName'] as String? ?? userName;
@@ -115,6 +126,7 @@ class AppState extends ChangeNotifier {
   Future<void> _save() async {
     final json = {
       'habits': habits,
+      'habitColors': habitColors.map((c) => c?.toARGB32()).toList(),
       'dark': dark,
       'settingsFlags': settingsFlags,
       'userName': userName,
@@ -256,6 +268,17 @@ class AppState extends ChangeNotifier {
     final t = name.trim();
     if (t.isEmpty) return;
     habits.add(t.toUpperCase());
+    habitColors.add(null);
+    _touch();
+  }
+
+  /// The highlighter color a habit's been tagged with, or null if untagged.
+  Color? habitColor(int habitIndex) =>
+      habitIndex >= 0 && habitIndex < habitColors.length ? habitColors[habitIndex] : null;
+
+  void setHabitColor(int habitIndex, Color? color) {
+    if (habitIndex < 0 || habitIndex >= habitColors.length) return;
+    habitColors[habitIndex] = color;
     _touch();
   }
 

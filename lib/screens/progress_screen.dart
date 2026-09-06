@@ -55,7 +55,7 @@ class ProgressScreen extends StatelessWidget {
     final hasSleepData = sleepAvgs.any((v) => v != null);
 
     // ---- Best streak per habit, all time ----
-    final streaks = app.habits.asMap().entries.map((e) => (e.value, app.allTimeBestStreak(e.key))).toList()
+    final streaks = app.habits.asMap().entries.map((e) => (e.value, app.allTimeBestStreak(e.key), app.habitColor(e.key))).toList()
       ..sort((a, b) => b.$2.compareTo(a.$2));
     final maxStreak = streaks.isEmpty ? 0 : streaks.first.$2;
 
@@ -123,7 +123,7 @@ class ProgressScreen extends StatelessWidget {
             padding: const EdgeInsets.only(top: 8),
             child: Column(
               children: [
-                for (final s in streaks) _StreakRow(name: s.$1, days: s.$2, maxDays: maxStreak),
+                for (final s in streaks) _StreakRow(name: s.$1, days: s.$2, maxDays: maxStreak, color: s.$3),
               ],
             ),
           ),
@@ -231,13 +231,18 @@ class _StreakRow extends StatelessWidget {
   final String name;
   final int days;
   final int maxDays;
+  final Color? color; // the habit's tagged highlighter color, if any
 
-  const _StreakRow({required this.name, required this.days, required this.maxDays});
+  const _StreakRow({required this.name, required this.days, required this.maxDays, this.color});
 
   @override
   Widget build(BuildContext context) {
     final t = context.paper;
     final frac = maxDays == 0 ? 0.0 : days / maxDays;
+    final isTop = days == maxDays && days > 0;
+    final fill = color == null
+        ? (isTop ? t.hi : t.hiFill)
+        : color!.withValues(alpha: isTop ? 1 : .45);
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: SizedBox(
@@ -259,7 +264,7 @@ class _StreakRow extends StatelessWidget {
                     child: Container(
                       height: 10,
                       decoration: BoxDecoration(
-                        color: days == maxDays && days > 0 ? t.hi : t.hiFill,
+                        color: fill,
                         border: Border.all(color: t.ink, width: 1),
                         borderRadius: BorderRadius.circular(5),
                       ),

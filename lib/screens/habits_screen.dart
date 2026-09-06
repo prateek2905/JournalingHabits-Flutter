@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../models/month_cursor.dart';
 import '../state/app_state.dart';
+import '../theme/habit_colors.dart';
 import '../theme/paper_tokens.dart';
 import '../theme/text_styles.dart';
 import '../widgets/add_row.dart';
@@ -111,7 +112,85 @@ class HabitsScreen extends StatelessWidget {
               ],
             ),
           ),
+          SectionHeader(heading: 'HABIT COLORS', meta: 'TAP TO MARK', topPadding: 24),
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [for (var i = 0; i < habits.length; i++) _HabitColorRow(index: i, name: habits[i])],
+            ),
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class _HabitColorRow extends StatelessWidget {
+  final int index;
+  final String name;
+  const _HabitColorRow({required this.index, required this.name});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.paper;
+    final app = context.watch<AppState>();
+    final selected = app.habitColor(index);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(name, style: PaperText.body(t.ink)),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _ColorSwatch(
+                color: null,
+                selected: selected == null,
+                onTap: () => app.setHabitColor(index, null),
+              ),
+              for (final c in habitColorPalette)
+                _ColorSwatch(
+                  color: c,
+                  selected: selected == c,
+                  onTap: () => app.setHabitColor(index, c),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ColorSwatch extends StatelessWidget {
+  final Color? color; // null = "no color" swatch
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _ColorSwatch({required this.color, required this.selected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.paper;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        width: 22,
+        height: 22,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: color,
+          border: Border.all(color: t.ink, width: selected ? 2 : 1),
+        ),
+        child: color == null
+            ? Text('✕', style: PaperText.small(t.ink, size: 11).copyWith(color: t.ink.withValues(alpha: t.ink.a * .5)))
+            : (selected ? Container(width: 7, height: 7, decoration: BoxDecoration(shape: BoxShape.circle, color: t.ink)) : null),
       ),
     );
   }
@@ -135,6 +214,7 @@ class _HabitTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.paper;
+    final app = context.watch<AppState>();
     final tableWidth = _colW + (showWeight ? _weightColW : 0) + _colW * habits.length;
 
     return SizedBox(
@@ -160,24 +240,51 @@ class _HabitTable extends StatelessWidget {
                       ),
                     ),
                   ),
-                ...habits.map((name) => GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onLongPress: () => _showCannotDeleteDialog(context, name),
-                      child: SizedBox(
-                        width: _colW,
-                        height: 120,
-                        child: Align(
-                          alignment: Alignment.bottomCenter,
-                          child: RotatedBox(
-                            quarterTurns: 3,
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(maxWidth: 120),
-                              child: Text(name, style: PaperText.small(t.ink, size: 11), overflow: TextOverflow.ellipsis),
+                ...habits.asMap().entries.map((e) {
+                  final color = app.habitColor(e.key);
+                  return GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onLongPress: () => _showCannotDeleteDialog(context, e.value),
+                    child: SizedBox(
+                      width: _colW,
+                      height: 120,
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: RotatedBox(
+                          quarterTurns: 3,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 120),
+                            child: SizedBox(
+                              height: 20,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  if (color != null)
+                                    Positioned(
+                                      left: 4, right: 4, top: 1.5, bottom: 1.5,
+                                      child: Transform.rotate(
+                                        angle: ((e.key % 3) - 1) * 1.2 * 3.14159265 / 180,
+                                        child: DecoratedBox(
+                                          decoration: BoxDecoration(
+                                            color: color,
+                                            borderRadius: const BorderRadius.only(
+                                              topLeft: Radius.circular(4), topRight: Radius.circular(7),
+                                              bottomRight: Radius.circular(3), bottomLeft: Radius.circular(6),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  Text(e.value, style: PaperText.small(t.ink, size: 11), overflow: TextOverflow.ellipsis),
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    )),
+                    ),
+                  );
+                }),
               ],
             ),
           ),

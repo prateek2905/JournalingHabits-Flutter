@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="habits_widget_desc">Habit success: today, this month and your streak.</string>
+    <string name="journal_widget_desc">Today\'s tasks, with a quick way into your journal.</string>
+    <string name="sleep_widget_desc">Last night\'s sleep, score and your 7-night trend.</string>
+</resources>

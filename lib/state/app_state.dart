@@ -8,6 +8,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../models/month_cursor.dart';
 import '../theme/paper_painter.dart' show PaperStyle;
 import '../theme/paper_tokens.dart' show PaperTheme;
+import '../services/widget_sync.dart';
 import '../models/month_data.dart';
 
 enum AppTab { journal, habits, sleep, profile }
@@ -74,6 +75,7 @@ class AppState extends ChangeNotifier {
     await Hive.initFlutter();
     _box = await Hive.openBox(_boxName);
     _load();
+    unawaited(WidgetSync.update(this));
     _ready = true;
     notifyListeners();
   }
@@ -146,6 +148,7 @@ class AppState extends ChangeNotifier {
       'months': months.map((k, v) => MapEntry(k, v.toJson())),
     };
     await _box.put(_stateKey, jsonEncode(json));
+    unawaited(WidgetSync.update(this));
   }
 
   void _touch() {

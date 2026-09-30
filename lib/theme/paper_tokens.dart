@@ -37,11 +37,41 @@ class PaperTokens extends ThemeExtension<PaperTokens> {
     required this.onHi,
   });
 
+  /// Derives a full token set from the colors that define a colorway; ink
+  /// tints and highlighter alphas follow the light/dark conventions.
+  factory PaperTokens._build({
+    required int paper1,
+    required int paper2,
+    required int ink,
+    required int grid,
+    bool dark = false,
+  }) {
+    Color inkAt(int a) => Color((a << 24) | (ink & 0xFFFFFF));
+    Color hiAt(int a) => Color((a << 24) | 0xB6FF2E);
+    return PaperTokens(
+      paper1: Color(paper1),
+      paper2: Color(paper2),
+      barA: Color((0x80 << 24) | (paper1 & 0xFFFFFF)),
+      barB: Color((0xF2 << 24) | (paper2 & 0xFFFFFF)),
+      ink: Color(ink),
+      ink65: inkAt(dark ? 0x9E : 0xA6),
+      ink60: inkAt(dark ? 0x8C : 0x99),
+      ink50: inkAt(dark ? 0x73 : 0x80),
+      ink40: inkAt(dark ? 0x59 : 0x66),
+      ink30: inkAt(dark ? 0x40 : 0x4D),
+      grid: Color(grid),
+      hi: const Color(0xFFB6FF2E),
+      hiFill: hiAt(dark ? 0x47 : 0x66),
+      hiSoft: hiAt(dark ? 0x29 : 0x42),
+      onHi: Color(dark ? 0xFF1B1D17 : 0xFF23241F),
+    );
+  }
+
   static const light = PaperTokens(
-    paper1: Color(0xFFFAF4E3),
-    paper2: Color(0xFFF2EAD4),
-    barA: Color(0x80FAF4E3),
-    barB: Color(0xF2F2EAD4),
+    paper1: Color(0xFFFDFCF8),
+    paper2: Color(0xFFF1EFE8),
+    barA: Color(0x80FDFCF8),
+    barB: Color(0xF2F1EFE8),
     ink: Color(0xFF23241F),
     ink65: Color(0xA623241F),
     ink60: Color(0x9923241F),
@@ -130,6 +160,61 @@ class PaperTokens extends ThemeExtension<PaperTokens> {
       hiSoft: Color.lerp(hiSoft, other.hiSoft, t)!,
       onHi: Color.lerp(onHi, other.onHi, t)!,
     );
+  }
+}
+
+/// Notebook paper colorways. Each one is a full token set; [isDark] drives
+/// the Material brightness and status-bar icon color.
+enum PaperTheme {
+  light('WHITE', false),
+  dark('BLACK', true),
+  oldPaper('OLD PAPER', false),
+  legalPad('LEGAL PAD', false),
+  kraft('KRAFT', false),
+  engineering('GREEN', false),
+  sky('BLUE', false),
+  blueprint('BLUEPRINT', true);
+
+  final String label;
+  final bool isDark;
+  const PaperTheme(this.label, this.isDark);
+
+  PaperTokens get tokens {
+    switch (this) {
+      case PaperTheme.light:
+        return PaperTokens.light;
+      case PaperTheme.dark:
+        return PaperTokens.dark;
+      case PaperTheme.oldPaper:
+        return PaperTokens._build(
+            paper1: 0xFFF3E4B8, paper2: 0xFFE6D3A0, ink: 0xFF3A2E1A, grid: 0x408B6B2E);
+      case PaperTheme.legalPad:
+        return PaperTokens._build(
+            paper1: 0xFFFBF3A5, paper2: 0xFFF2E88A, ink: 0xFF1F2A44, grid: 0x554A80C0);
+      case PaperTheme.kraft:
+        return PaperTokens._build(
+            paper1: 0xFFD9BC8C, paper2: 0xFFC8A874, ink: 0xFF2B2118, grid: 0x405A4126);
+      case PaperTheme.engineering:
+        return PaperTokens._build(
+            paper1: 0xFFE4F0D8, paper2: 0xFFD3E5C4, ink: 0xFF1F2B1D, grid: 0x4D3F7A3A);
+      case PaperTheme.sky:
+        return PaperTokens._build(
+            paper1: 0xFFE3EEF8, paper2: 0xFFD0E2F2, ink: 0xFF1B2838, grid: 0x4D4A7FB0);
+      case PaperTheme.blueprint:
+        return PaperTokens._build(
+            paper1: 0xFF1E3A6E,
+            paper2: 0xFF152B55,
+            ink: 0xFFF2F6FF,
+            grid: 0x40BFD8FF,
+            dark: true);
+    }
+  }
+
+  static PaperTheme fromName(String? name, {bool legacyDark = false}) {
+    for (final t in values) {
+      if (t.name == name) return t;
+    }
+    return legacyDark ? PaperTheme.dark : PaperTheme.light;
   }
 }
 

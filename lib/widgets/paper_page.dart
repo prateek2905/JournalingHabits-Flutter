@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'package:provider/provider.dart';
+
+import '../state/app_state.dart';
 import '../theme/paper_painter.dart';
 import '../theme/paper_tokens.dart';
 
@@ -16,6 +19,7 @@ class PaperPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.paper;
+    final style = context.select<AppState, PaperStyle>((a) => a.paperStyle);
     // 40px covers the classic ~20px status bar; taller notches/Dynamic
     // Islands need more — round up to the next grid row so the title still
     // lands on a 20px line.
@@ -33,7 +37,7 @@ class PaperPage extends StatelessWidget {
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: minHeight),
             child: CustomPaint(
-              painter: PaperPainter(paper1: t.paper1, paper2: t.paper2, gridColor: t.grid),
+              painter: PaperPainter(paper1: t.paper1, paper2: t.paper2, gridColor: t.grid, style: style),
               child: Padding(
                 padding: EdgeInsets.fromLTRB(20, topPad, 20, 20),
                 child: child,

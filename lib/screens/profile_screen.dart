@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../state/app_state.dart';
+import '../theme/paper_painter.dart';
 import '../theme/paper_tokens.dart';
 import '../theme/text_styles.dart';
 import '../widgets/callout_card.dart';
@@ -106,7 +107,8 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 Text('SETTINGS',
                     style: PaperText.body(t.ink).copyWith(fontSize: 13, color: t.ink.withValues(alpha: t.ink.a * .6))),
-                _DarkModeRow(),
+                const _ThemeRow(),
+                const _PaperStyleRow(),
                 for (var i = 0; i < defaultSettingLabels.length; i++)
                   _SettingRow(index: i),
               ],
@@ -169,43 +171,91 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
-class _DarkModeRow extends StatelessWidget {
-  const _DarkModeRow();
+/// Picks the paper colorway: one swatch per [PaperTheme].
+class _ThemeRow extends StatelessWidget {
+  const _ThemeRow();
 
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppState>();
     final t = context.paper;
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: app.toggleDark,
-      child: SizedBox(
-        height: 20,
-        child: Row(
-          children: [
-            SizedBox(
-              width: 20,
-              child: Center(
-                child: Container(
-                  width: 32,
-                  height: 14,
-                  padding: const EdgeInsets.symmetric(horizontal: 1),
-                  alignment: app.dark ? Alignment.centerRight : Alignment.centerLeft,
-                  decoration: BoxDecoration(border: Border.all(color: t.ink, width: 1.5), borderRadius: BorderRadius.circular(8)),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            height: 20,
+            child: Text('PAGE COLOR · ${app.theme.label}', style: PaperText.body(t.ink)),
+          ),
+          const SizedBox(height: 4),
+          Wrap(
+            spacing: 10,
+            runSpacing: 8,
+            children: [
+              for (final th in PaperTheme.values)
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => app.setTheme(th),
                   child: Container(
-                    width: 9,
-                    height: 9,
-                    decoration: BoxDecoration(shape: BoxShape.circle, color: app.dark ? t.hi : t.ink),
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: th.tokens.paper1,
+                      border: Border.all(
+                        color: app.theme == th ? t.ink : t.ink30,
+                        width: app.theme == th ? 2.5 : 1.5,
+                      ),
+                    ),
+                    child: app.theme == th
+                        ? Center(child: Icon(Icons.check, size: 16, color: th.tokens.ink))
+                        : null,
                   ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Picks the notebook ruling used behind every page in the app.
+class _PaperStyleRow extends StatelessWidget {
+  const _PaperStyleRow();
+
+  @override
+  Widget build(BuildContext context) {
+    final app = context.watch<AppState>();
+    final t = context.paper;
+    return SizedBox(
+      height: 20,
+      child: Row(
+        children: [
+          Text('PAPER', style: PaperText.body(t.ink)),
+          const SizedBox(width: 10),
+          for (final s in PaperStyle.values)
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => app.setPaperStyle(s),
+              child: Container(
+                height: 18,
+                margin: const EdgeInsets.only(right: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: app.paperStyle == s ? t.hi : null,
+                  border: Border.all(color: app.paperStyle == s ? t.ink : t.ink30, width: 1.5),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  s.label,
+                  style: PaperText.small(app.paperStyle == s ? t.onHi : t.ink, size: 10),
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 16),
-              child: Text('DARK MODE · ${app.dark ? "ON" : "OFF"}', style: PaperText.body(t.ink)),
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }

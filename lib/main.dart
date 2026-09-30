@@ -19,10 +19,11 @@ class JournalingHabitsApp extends StatelessWidget {
       create: (_) => AppState()..init(),
       child: Consumer<AppState>(
         builder: (context, app, _) {
-          final tokens = app.ready && app.dark ? PaperTokens.dark : PaperTokens.light;
+          final theme = app.ready ? app.theme : PaperTheme.light;
+          final tokens = theme.tokens;
           if (app.ready) {
             SystemChrome.setSystemUIOverlayStyle(
-              app.dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+              theme.isDark ?SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
             );
           }
           return MaterialApp(
@@ -30,7 +31,7 @@ class JournalingHabitsApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
               useMaterial3: true,
-              brightness: tokens == PaperTokens.dark ? Brightness.dark : Brightness.light,
+              brightness: theme.isDark ?Brightness.dark : Brightness.light,
               scaffoldBackgroundColor: tokens.paper1,
               extensions: [tokens],
             ),

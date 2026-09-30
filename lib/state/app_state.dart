@@ -6,6 +6,8 @@ import 'package:flutter/material.dart' show Color;
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../models/month_cursor.dart';
+import '../theme/paper_painter.dart' show PaperStyle;
+import '../theme/paper_tokens.dart' show PaperTheme;
 import '../models/month_data.dart';
 
 enum AppTab { journal, habits, sleep, profile }
@@ -43,7 +45,9 @@ class AppState extends ChangeNotifier {
   List<Color?> habitColors = List<Color?>.filled(defaultHabits.length, null, growable: true);
   final Map<String, MonthData> months = {};
 
-  bool dark = false;
+  PaperTheme theme = PaperTheme.light;
+  bool get dark => theme.isDark;
+  PaperStyle paperStyle = PaperStyle.grid;
   List<bool> settingsFlags = [true, true, true, false];
   String userName = 'YOU';
   late MonthCursor installMonth;
@@ -89,7 +93,8 @@ class AppState extends ChangeNotifier {
       if (habitColors.length > habits.length) {
         habitColors = habitColors.sublist(0, habits.length);
       }
-      dark = json['dark'] as bool? ?? false;
+      theme = PaperTheme.fromName(json['theme'] as String?, legacyDark: json['dark'] as bool? ?? false);
+      paperStyle = PaperStyle.fromName(json['paperStyle'] as String?);
       settingsFlags = ((json['settingsFlags'] as List?) ?? settingsFlags).cast<bool>();
       userName = json['userName'] as String? ?? userName;
       if (json['installMonth'] != null) {
@@ -127,7 +132,8 @@ class AppState extends ChangeNotifier {
     final json = {
       'habits': habits,
       'habitColors': habitColors.map((c) => c?.toARGB32()).toList(),
-      'dark': dark,
+      'theme': theme.name,
+      'paperStyle': paperStyle.name,
       'settingsFlags': settingsFlags,
       'userName': userName,
       'installMonth': installMonth.key,
@@ -314,8 +320,15 @@ class AppState extends ChangeNotifier {
 
   // ---- Profile / settings ----
 
-  void toggleDark() {
-    dark = !dark;
+  void setTheme(PaperTheme t) {
+    if (theme == t) return;
+    theme = t;
+    _touch();
+  }
+
+  void setPaperStyle(PaperStyle style) {
+    if (paperStyle == style) return;
+    paperStyle = style;
     _touch();
   }
 

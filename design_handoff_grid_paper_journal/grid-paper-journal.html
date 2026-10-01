@@ -1,0 +1,1381 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Grid Paper Journal — design reference</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<!--
+Design reference for the Grid Paper habits & journal app (Flutter).
+Screens: Journal, Habits, Sleep, Profile, Progress, plus the notebook papers/markers sheet.
+Rules: everything sits on a 20px grid; fonts Caveat 700 (titles) + Kalam (everything else);
+neon #B6FF2E is the only accent; borders use irregular radii. Token source: lib/theme/paper_tokens.dart.
+Each board is a fixed-size div; inline CSS variables (--p1, --ink, --grid ...) hold the paper tokens.
+-->
+<style>
+body{margin:0;background:#9aa896;font-family:system-ui,sans-serif;color:#222}
+header{position:sticky;top:0;z-index:5;display:flex;gap:12px;align-items:center;padding:10px 20px;background:#23241F;color:#F0EAD6}
+header h1{font-size:16px;margin:0;font-weight:600}
+select{font:inherit;padding:4px 8px}
+main{display:flex;flex-wrap:wrap;gap:40px;padding:32px 20px;align-items:flex-start}
+.board h2{margin:0 0 8px;font-size:13px;font-weight:600;color:#23241F}
+.board>div{box-shadow:0 8px 30px rgba(0,0,0,.25)}
+*{box-sizing:border-box}
+
+
+
+
+body{margin:0}#bMaindchtml *{box-sizing:border-box}#bMaindchtml .sh{font-size:17px;line-height:20px;letter-spacing:1.2px;box-shadow:0 2px 0 var(--ink);white-space:nowrap}#bMaindchtml .sm{font-size:12px;line-height:20px;opacity:.55;white-space:nowrap}#bMaindchtml .r{height:20px;display:flex;align-items:center;font-size:14px;line-height:20px;letter-spacing:.2px;white-space:nowrap}#bMaindchtml .g{width:20px;flex:none;text-align:center;font-size:15px}#bMaindchtml .in{flex:1;min-width:0;height:20px;border:0;background:transparent;box-shadow:0 2px 0 var(--i50);font-family:Kalam,cursive;font-size:14px;letter-spacing:.2px;color:var(--ink);outline:none;padding:0;text-transform:uppercase}#bMaindchtml .in::placeholder{color:var(--i40)}#bMaindchtml .pill{height:20px;margin-left:8px;padding:0 10px;border:1.5px solid var(--ink);border-radius:11px 9px 10px 10px;background:transparent;color:var(--ink);font-family:Kalam,cursive;font-size:13px;line-height:17px;text-transform:uppercase}#bMaindchtml .nav{width:28px;height:40px;padding:0;border:2px solid var(--ink);background:transparent;color:var(--ink);font-family:Caveat,cursive;font-weight:700;font-size:22px;line-height:1}#bMaindchtml .bar{position:absolute;left:0;right:0;bottom:0;height:80px;padding:6px 12px 30px;display:flex;background:linear-gradient(var(--barA),var(--barB));box-shadow:inset 0 2px 0 var(--i50)}#bMaindchtml .tab{flex:1;position:relative;height:44px;padding:0;border:0;background:transparent;color:var(--ink);font-family:Kalam,cursive;font-size:14px;line-height:20px;letter-spacing:.6px;text-transform:uppercase}#bMaindchtml .tab span{position:relative;z-index:1}#bMaindchtml .tab.on{font-weight:700;color:var(--onHi)}#bMaindchtml .tab.on::before{content:"";position:absolute;left:8px;right:8px;top:13px;height:17px;background:var(--hi);border-radius:9px 6px 10px 7px;transform:rotate(-1deg)}#bMaindchtml .tab.pf{flex:none;width:44px;display:flex;align-items:center;justify-content:center}
+
+
+
+
+
+body{margin:0}#bHabitsdchtml *{box-sizing:border-box}#bHabitsdchtml .sh{font-size:17px;line-height:20px;letter-spacing:1.2px;box-shadow:0 2px 0 var(--ink);white-space:nowrap}#bHabitsdchtml .sm{font-size:12px;line-height:20px;opacity:.55;white-space:nowrap}#bHabitsdchtml .in{flex:1;min-width:0;height:20px;border:0;background:transparent;box-shadow:0 2px 0 var(--i50);font-family:Kalam,cursive;font-size:14px;letter-spacing:.2px;color:var(--ink);outline:none;padding:0;text-transform:uppercase}#bHabitsdchtml .in::placeholder{color:var(--i40)}#bHabitsdchtml .pill{height:20px;margin-left:8px;padding:0 10px;border:1.5px solid var(--ink);border-radius:11px 9px 10px 10px;background:transparent;color:var(--ink);font-family:Kalam,cursive;font-size:13px;line-height:17px;text-transform:uppercase}#bHabitsdchtml .nav{width:28px;height:40px;padding:0;border:2px solid var(--ink);background:transparent;color:var(--ink);font-family:Caveat,cursive;font-weight:700;font-size:22px;line-height:1}#bHabitsdchtml .bar{position:absolute;left:0;right:0;bottom:0;height:80px;padding:6px 12px 30px;display:flex;background:linear-gradient(var(--barA),var(--barB));box-shadow:inset 0 2px 0 var(--i50)}#bHabitsdchtml .tab{flex:1;position:relative;height:44px;padding:0;border:0;background:transparent;color:var(--ink);font-family:Kalam,cursive;font-size:14px;line-height:20px;letter-spacing:.6px;text-transform:uppercase}#bHabitsdchtml .tab span{position:relative;z-index:1}#bHabitsdchtml .tab.on{font-weight:700;color:var(--onHi)}#bHabitsdchtml .tab.on::before{content:"";position:absolute;left:8px;right:8px;top:13px;height:17px;background:var(--hi);border-radius:9px 6px 10px 7px;transform:rotate(-1deg)}#bHabitsdchtml .tab.pf{flex:none;width:44px;display:flex;align-items:center;justify-content:center}#bHabitsdchtml .cell{width:20px;height:20px;flex:none;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1;opacity:.85}#bHabitsdchtml .chip{height:20px;padding:0 10px;border:1.5px solid var(--ink);font-size:12px;line-height:17px;white-space:nowrap}
+
+
+
+
+
+body{margin:0}#bSleepdchtml *{box-sizing:border-box}#bSleepdchtml .sh{font-size:17px;line-height:20px;letter-spacing:1.2px;box-shadow:0 2px 0 var(--ink);white-space:nowrap}#bSleepdchtml .sm{font-size:12px;line-height:20px;opacity:.55;white-space:nowrap}#bSleepdchtml .nav{width:28px;height:40px;padding:0;border:2px solid var(--ink);background:transparent;color:var(--ink);font-family:Caveat,cursive;font-weight:700;font-size:22px;line-height:1}#bSleepdchtml .bar{position:absolute;left:0;right:0;bottom:0;height:80px;padding:6px 12px 30px;display:flex;background:linear-gradient(var(--barA),var(--barB));box-shadow:inset 0 2px 0 var(--i50)}#bSleepdchtml .tab{flex:1;position:relative;height:44px;padding:0;border:0;background:transparent;color:var(--ink);font-family:Kalam,cursive;font-size:14px;line-height:20px;letter-spacing:.6px;text-transform:uppercase}#bSleepdchtml .tab span{position:relative;z-index:1}#bSleepdchtml .tab.on{font-weight:700;color:var(--onHi)}#bSleepdchtml .tab.on::before{content:"";position:absolute;left:8px;right:8px;top:13px;height:17px;background:var(--hi);border-radius:9px 6px 10px 7px;transform:rotate(-1deg)}#bSleepdchtml .tab.pf{flex:none;width:44px;display:flex;align-items:center;justify-content:center}#bSleepdchtml .tk{position:absolute;top:0;transform:translateX(-50%);font-size:11px;line-height:20px;opacity:.7}
+
+
+
+
+
+body{margin:0}#bProfiledchtml *{box-sizing:border-box}#bProfiledchtml .sh{font-size:17px;line-height:20px;letter-spacing:1.2px;box-shadow:0 2px 0 var(--ink);white-space:nowrap}#bProfiledchtml .sm{font-size:12px;line-height:20px;opacity:.55;white-space:nowrap}#bProfiledchtml .r{height:20px;display:flex;align-items:center;font-size:14px;line-height:20px;letter-spacing:.2px;white-space:nowrap}#bProfiledchtml .lead{flex:1;height:0;margin:8px 6px 0;border-bottom:2px dotted var(--i30)}#bProfiledchtml .val{font-size:14px;line-height:20px}#bProfiledchtml .box{width:16px;height:16px;flex:none;margin:0 6px 0 2px;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--ink);border-radius:3px 4px 3px 5px;font-size:13px;line-height:1}#bProfiledchtml .card{height:40px;padding:0 12px;border:1.5px solid var(--ink);background:var(--hiFill)}#bProfiledchtml .nav{width:28px;height:40px;padding:0;border:2px solid var(--ink);background:transparent;color:var(--ink);font-family:Caveat,cursive;font-weight:700;font-size:22px;line-height:1}#bProfiledchtml .bar{position:absolute;left:0;right:0;bottom:0;height:80px;padding:6px 12px 30px;display:flex;background:linear-gradient(var(--barA),var(--barB));box-shadow:inset 0 2px 0 var(--i50)}#bProfiledchtml .tab{flex:1;position:relative;height:44px;padding:0;border:0;background:transparent;color:var(--ink);font-family:Kalam,cursive;font-size:14px;line-height:20px;letter-spacing:.6px;text-transform:uppercase}#bProfiledchtml .tab span{position:relative;z-index:1}#bProfiledchtml .tab.on{font-weight:700;color:var(--onHi)}#bProfiledchtml .tab.on::before{content:"";position:absolute;left:8px;right:8px;top:13px;height:17px;background:var(--hi);border-radius:9px 6px 10px 7px;transform:rotate(-1deg)}#bProfiledchtml .tab.pf{flex:none;width:44px;display:flex;align-items:center;justify-content:center}#bProfiledchtml .tab.pf.on::before{display:none}#bProfiledchtml .sw{width:20px;height:20px;flex:none;border:1px solid var(--ink)}
+
+
+
+
+
+body{margin:0}#bProgressdchtml *{box-sizing:border-box}#bProgressdchtml .sh{font-size:17px;line-height:20px;letter-spacing:1.2px;box-shadow:0 2px 0 var(--ink);white-space:nowrap}#bProgressdchtml .sm{font-size:12px;line-height:20px;opacity:.55;white-space:nowrap}#bProgressdchtml .nav{width:28px;height:40px;padding:0;border:2px solid var(--ink);background:transparent;color:var(--ink);font-family:Caveat,cursive;font-weight:700;font-size:22px;line-height:1}#bProgressdchtml .chip{height:20px;padding:0 10px;border:1.5px solid var(--ink);font-size:12px;line-height:17px;white-space:nowrap}#bProgressdchtml .bar{position:absolute;left:0;right:0;bottom:0;height:80px;padding:6px 12px 30px;display:flex;background:linear-gradient(var(--barA),var(--barB));box-shadow:inset 0 2px 0 var(--i50)}#bProgressdchtml .tab{flex:1;position:relative;height:44px;padding:0;border:0;background:transparent;color:var(--ink);font-family:Kalam,cursive;font-size:14px;line-height:20px;letter-spacing:.6px;text-transform:uppercase}#bProgressdchtml .tab span{position:relative;z-index:1}#bProgressdchtml .tab.pf{flex:none;width:44px;display:flex;align-items:center;justify-content:center}#bProgressdchtml .hc{width:20px;height:20px;flex:none;display:flex;align-items:center;justify-content:center}#bProgressdchtml .hc i{display:block;width:14px;height:14px;border:1px solid var(--i40);border-radius:2px 3px 2px 3px}
+
+
+
+
+
+body{margin:0}#bPapersdchtml *{box-sizing:border-box}#bPapersdchtml .mk{height:20px;display:flex;align-items:center;justify-content:center;padding:0 10px;border:1.5px solid #23241F;font-size:11px;line-height:17px;color:#23241F}
+
+
+</style></head>
+<body>
+<header><h1>Grid Paper Journal</h1><label>Paper <select id="paper"><option>light</option><option>dark</option><option>oldPaper</option><option>legalPad</option><option>kraft</option><option>engineering</option><option>sky</option><option>blueprint</option></select></label></header>
+<main>
+<section class="board"><h2>Journal</h2><div id="bMaindchtml" style="width:400px;height:860px">
+
+<div style="width:400px;height:860px;position:relative;overflow:hidden;font-family:Kalam,cursive;color:var(--ink);text-transform:uppercase;background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px),linear-gradient(var(--p1),var(--p2));background-size:20px 20px,20px 20px,100% 100%;--p1:#FDFCF8;--p2:#F1EFE8;--ink:rgb(35,36,31);--i65:rgba(35,36,31,0.65);--i60:rgba(35,36,31,0.6);--i50:rgba(35,36,31,0.5);--i40:rgba(35,36,31,0.4);--i30:rgba(35,36,31,0.3);--grid:rgba(96,98,72,.2);--hi:#B6FF2E;--hiFill:rgba(182,255,46,0.4);--hiSoft:rgba(182,255,46,0.26);--onHi:#23241F;--barA:rgba(253,252,248,.5);--barB:rgba(241,239,232,.95);">
+<div style="padding:40px 20px 0">
+
+<div style="height:80px;display:flex;align-items:flex-end;justify-content:space-between">
+<div>
+<h1 style="margin:0;display:inline-block;font-family:Caveat,cursive;font-weight:700;font-size:34px;line-height:40px;letter-spacing:.5px;white-space:nowrap;box-shadow:0 2px 0 var(--ink)">FRI 28 AUG</h1>
+<div style="font-size:12px;line-height:20px;letter-spacing:.4px;opacity:.6">AUGUST 2026 · TODAY</div>
+</div>
+<div style="display:flex;gap:4px">
+<button class="nav" aria-label="Previous day" style="border-radius:14px 4px 13px 5px">&lt;</button>
+<button class="nav" aria-label="Next day" disabled style="border-radius:5px 13px 4px 14px;opacity:.3">&gt;</button>
+</div>
+</div>
+
+<div style="height:40px;display:flex;align-items:flex-end;gap:8px"><span class="sh">TASKS</span><span class="sm">4 OPEN · TAP TO CROSS OFF</span></div>
+<div class="r"><span class="g" style="font-size:13px">□</span>REPLY TO THE EDITOR</div>
+<div class="r"><span class="g" style="font-size:13px">□</span>BOOK THE DENTIST</div>
+<div class="r"><span class="g" style="font-size:13px">□</span>EDIT THE 100KM VIDEO</div>
+<div class="r"><span class="g" style="font-size:13px">□</span>PLAN SEPT TRAINING BLOCK</div>
+<div class="r" style="opacity:.42"><span class="g">✕</span><span style="text-decoration:line-through;text-decoration-thickness:2px">CALL MUM BACK</span></div>
+<div class="r" style="margin-top:20px"><span class="g" style="font-size:13px;opacity:.4">□</span><input class="in" placeholder="Add a task…" aria-label="Add a task"><button class="pill">ADD</button></div>
+
+<div style="height:60px;padding-top:20px;display:flex;align-items:flex-end;gap:8px"><span class="sh">MEMORABLE MOMENTS</span><span class="sm">28 IN AUG</span></div>
+<div class="r"><span class="g">·</span>RUN CLUB THEN IN-PERSON MEETING</div>
+<div class="r"><span class="g">·</span>SUNRISE FROM THE RIDGE</div>
+<div class="r"><span class="g">·</span>COFFEE WITH SAM</div>
+<div class="r" style="margin-top:20px"><span class="g" style="opacity:.4">+</span><input class="in" placeholder="Write a moment…" aria-label="Write a moment"><button class="pill">ADD</button></div>
+
+<div style="margin-top:40px;box-shadow:inset 0 2px 0 var(--i40)">
+<div style="font-size:13px;line-height:20px;opacity:.6">AUGUST 2026 INTENTIONS</div>
+<div style="font-size:14px;line-height:20px;letter-spacing:.2px">ALONE TIME. NO SOCIAL MEDIA ON WAKING. ONE LONG RUN EACH WEEK.</div>
+</div>
+
+</div>
+
+<nav class="bar" aria-label="Tabs">
+<button class="tab on"><span>JOURNAL</span></button>
+<button class="tab"><span>HABITS</span></button>
+<button class="tab"><span>SLEEP</span></button>
+<button class="tab pf" aria-label="Profile"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="11"/><circle cx="12" cy="10" r="3.5"/><path d="M5.5 19c1-4 4-5 6.5-5s5.5 1 6.5 5"/></svg></button>
+</nav>
+</div>
+</div></section>
+<section class="board"><h2>Habits</h2><div id="bHabitsdchtml" style="width:400px;height:1040px">
+
+<div style="width:400px;height:1040px;position:relative;overflow:hidden;font-family:Kalam,cursive;color:var(--ink);text-transform:uppercase;background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px),linear-gradient(var(--p1),var(--p2));background-size:20px 20px,20px 20px,100% 100%;--p1:#FDFCF8;--p2:#F1EFE8;--ink:rgb(35,36,31);--i65:rgba(35,36,31,0.65);--i60:rgba(35,36,31,0.6);--i50:rgba(35,36,31,0.5);--i40:rgba(35,36,31,0.4);--i30:rgba(35,36,31,0.3);--grid:rgba(96,98,72,.2);--hi:#B6FF2E;--hiFill:rgba(182,255,46,0.4);--hiSoft:rgba(182,255,46,0.26);--onHi:#23241F;--barA:rgba(253,252,248,.5);--barB:rgba(241,239,232,.95);">
+<div style="padding:40px 20px 0">
+
+<div style="height:80px;display:flex;align-items:flex-end;justify-content:space-between">
+<div>
+<h1 style="margin:0;display:inline-block;font-family:Caveat,cursive;font-weight:700;font-size:34px;line-height:40px;letter-spacing:.5px;white-space:nowrap;box-shadow:0 2px 0 var(--ink)">AUGUST 2026</h1>
+<div style="font-size:12px;line-height:20px;letter-spacing:.4px;opacity:.6">DAY 28 · IN PROGRESS</div>
+</div>
+<div style="display:flex;gap:4px">
+<button class="nav" aria-label="Previous month" style="border-radius:14px 4px 13px 5px">&lt;</button>
+<button class="nav" aria-label="Next month" disabled style="border-radius:5px 13px 4px 14px;opacity:.3">&gt;</button>
+</div>
+</div>
+
+<div style="height:40px;display:flex;align-items:flex-end;gap:8px"><span class="sh">HABIT TRACKER</span><span class="sm">TAP TO X</span></div>
+
+<div style="display:flex;height:120px;align-items:stretch">
+<div style="width:20px;flex:none"></div>
+<div style="width:40px;flex:none;writing-mode:vertical-rl;transform:rotate(180deg);display:flex;align-items:center;justify-content:flex-start;font-size:11px;line-height:20px;letter-spacing:.3px;white-space:nowrap"><span style="padding:0 2px">WEIGHT KG</span></div>
+
+<div style="width:20px;flex:none;writing-mode:vertical-rl;transform:rotate(180deg);display:flex;align-items:center;justify-content:flex-start;font-size:11px;line-height:20px;letter-spacing:.3px;white-space:nowrap"><span style="padding:0 3px;background:#B6FF2EB3;color:#23241F;border-radius:3px 2px 3px 2px">COLD EXPOSURE</span></div>
+
+<div style="width:20px;flex:none;writing-mode:vertical-rl;transform:rotate(180deg);display:flex;align-items:center;justify-content:flex-start;font-size:11px;line-height:20px;letter-spacing:.3px;white-space:nowrap"><span style="padding:0 3px;background:#FFE156B3;color:#23241F;border-radius:3px 2px 3px 2px">EXERCISE</span></div>
+
+<div style="width:20px;flex:none;writing-mode:vertical-rl;transform:rotate(180deg);display:flex;align-items:center;justify-content:flex-start;font-size:11px;line-height:20px;letter-spacing:.3px;white-space:nowrap"><span style="padding:0 3px;background:#FF9F45B3;color:#23241F;border-radius:3px 2px 3px 2px">STRETCHING</span></div>
+
+<div style="width:20px;flex:none;writing-mode:vertical-rl;transform:rotate(180deg);display:flex;align-items:center;justify-content:flex-start;font-size:11px;line-height:20px;letter-spacing:.3px;white-space:nowrap"><span style="padding:0 3px;background:#FF6B9DB3;color:#23241F;border-radius:3px 2px 3px 2px">NO PHONE AM</span></div>
+
+<div style="width:20px;flex:none;writing-mode:vertical-rl;transform:rotate(180deg);display:flex;align-items:center;justify-content:flex-start;font-size:11px;line-height:20px;letter-spacing:.3px;white-space:nowrap"><span style="padding:0 3px;background:#5CD6FFB3;color:#23241F;border-radius:3px 2px 3px 2px">MEDITATION</span></div>
+
+<div style="width:20px;flex:none;writing-mode:vertical-rl;transform:rotate(180deg);display:flex;align-items:center;justify-content:flex-start;font-size:11px;line-height:20px;letter-spacing:.3px;white-space:nowrap"><span style="padding:0 3px;background:#8C7BFFB3;color:#23241F;border-radius:3px 2px 3px 2px">READ 5 PAGES</span></div>
+
+<div style="width:20px;flex:none;writing-mode:vertical-rl;transform:rotate(180deg);display:flex;align-items:center;justify-content:flex-start;font-size:11px;line-height:20px;letter-spacing:.3px;white-space:nowrap"><span style="padding:0 3px;background:#4DDFC0B3;color:#23241F;border-radius:3px 2px 3px 2px">FLOSS TEETH</span></div>
+
+<div style="width:20px;flex:none;writing-mode:vertical-rl;transform:rotate(180deg);display:flex;align-items:center;justify-content:flex-start;font-size:11px;line-height:20px;letter-spacing:.3px;white-space:nowrap"><span style="padding:0 3px;background:#FF6B6BB3;color:#23241F;border-radius:3px 2px 3px 2px">JOURNAL</span></div>
+
+<div style="width:20px;flex:none;writing-mode:vertical-rl;transform:rotate(180deg);display:flex;align-items:center;justify-content:flex-start;font-size:11px;line-height:20px;letter-spacing:.3px;white-space:nowrap"><span style="padding:0 3px;background:#B6FF2EB3;color:#23241F;border-radius:3px 2px 3px 2px">COFFEE</span></div>
+
+<div style="width:20px;flex:none;writing-mode:vertical-rl;transform:rotate(180deg);display:flex;align-items:center;justify-content:flex-start;font-size:11px;line-height:20px;letter-spacing:.3px;white-space:nowrap"><span style="padding:0 3px;background:#FFE156B3;color:#23241F;border-radius:3px 2px 3px 2px">SAUNA</span></div>
+
+</div>
+
+<div style="position:relative">
+
+<div style="display:flex;height:20px;box-shadow:inset 0 2px 0 var(--i65);">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">1</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">84.5</div>
+
+<div class="cell"></div>
+
+<div class="cell">✗</div>
+
+<div class="cell">✕</div>
+
+<div class="cell">×</div>
+
+<div class="cell">✗</div>
+
+<div class="cell">✕</div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell">✕</div>
+
+<div class="cell">×</div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">2</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">—</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">×</div>
+
+<div class="cell">✗</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✗</div>
+
+<div class="cell">✕</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">3</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">—</div>
+
+<div class="cell">✕</div>
+
+<div class="cell"></div>
+
+<div class="cell">✗</div>
+
+<div class="cell"></div>
+
+<div class="cell">×</div>
+
+<div class="cell">✗</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✗</div>
+
+<div class="cell">✕</div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">4</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">84.0</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✕</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✕</div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">×</div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">5</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">—</div>
+
+<div class="cell">✗</div>
+
+<div class="cell">✕</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✕</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">6</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">—</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✗</div>
+
+<div class="cell">✕</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✗</div>
+
+<div class="cell">✕</div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">7</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">84.0</div>
+
+<div class="cell">×</div>
+
+<div class="cell">✗</div>
+
+<div class="cell"></div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell">✕</div>
+
+<div class="cell"></div>
+
+<div class="cell">✗</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">8</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">—</div>
+
+<div class="cell"></div>
+
+<div class="cell">✕</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✕</div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">9</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">—</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">10</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">84.7</div>
+
+<div class="cell">×</div>
+
+<div class="cell">✗</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✗</div>
+
+<div class="cell">✕</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✕</div>
+
+<div class="cell">×</div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">11</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">—</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✗</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✗</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">12</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">—</div>
+
+<div class="cell">✕</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✕</div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">13</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">84.2</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✕</div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell">✕</div>
+
+<div class="cell">×</div>
+
+<div class="cell">✗</div>
+
+<div class="cell">✕</div>
+
+<div class="cell">×</div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">14</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">—</div>
+
+<div class="cell">✗</div>
+
+<div class="cell">✕</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✗</div>
+
+<div class="cell">✕</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">15</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">—</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✗</div>
+
+<div class="cell"></div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell">✕</div>
+
+<div class="cell"></div>
+
+<div class="cell">✗</div>
+
+<div class="cell">✕</div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">16</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">83.9</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✕</div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">×</div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">17</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">—</div>
+
+<div class="cell">✗</div>
+
+<div class="cell">✕</div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell">✕</div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">18</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">—</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✗</div>
+
+<div class="cell">✕</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✕</div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">19</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">84.1</div>
+
+<div class="cell">×</div>
+
+<div class="cell">✗</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✗</div>
+
+<div class="cell">✕</div>
+
+<div class="cell"></div>
+
+<div class="cell">✗</div>
+
+<div class="cell"></div>
+
+<div class="cell">×</div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">20</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">—</div>
+
+<div class="cell"></div>
+
+<div class="cell">✕</div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">×</div>
+
+<div class="cell">✗</div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">21</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">—</div>
+
+<div class="cell">✕</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">22</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">83.8</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✗</div>
+
+<div class="cell">✕</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✕</div>
+
+<div class="cell">×</div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">23</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">—</div>
+
+<div class="cell"></div>
+
+<div class="cell">✕</div>
+
+<div class="cell"></div>
+
+<div class="cell">✗</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✕</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">24</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">—</div>
+
+<div class="cell">✕</div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">×</div>
+
+<div class="cell">✗</div>
+
+<div class="cell"></div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">25</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">83.9</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">×</div>
+
+<div class="cell">✗</div>
+
+<div class="cell"></div>
+
+<div class="cell">×</div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">26</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">—</div>
+
+<div class="cell">✗</div>
+
+<div class="cell">✕</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✕</div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">27</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">—</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✗</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">✕</div>
+
+<div class="cell"></div>
+
+<div class="cell">✗</div>
+
+<div class="cell"></div>
+
+</div>
+
+<div style="display:flex;height:20px;">
+<div style="width:20px;flex:none;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">28</div>
+<div style="width:40px;flex:none;text-align:center;font-size:11px;line-height:20px;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">83.6</div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">×</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+<div class="cell">×</div>
+
+<div class="cell">✗</div>
+
+<div class="cell"></div>
+
+<div class="cell"></div>
+
+</div>
+
+<div style="display:flex;height:20px;box-shadow:inset 0 2px 0 var(--i65)">
+<div style="width:20px;flex:none"></div>
+<div style="width:40px;flex:none;text-align:center;font-size:10px;line-height:20px;opacity:.55;box-shadow:inset 2px 0 0 var(--i50),inset -2px 0 0 var(--i50)">TOTAL</div>
+
+<div class="cell" style="font-size:11px">12</div>
+
+<div class="cell" style="font-size:11px">12</div>
+
+<div class="cell" style="font-size:11px">12</div>
+
+<div class="cell" style="font-size:11px">12</div>
+
+<div class="cell" style="font-size:11px">12</div>
+
+<div class="cell" style="font-size:11px">12</div>
+
+<div class="cell" style="font-size:11px">12</div>
+
+<div class="cell" style="font-size:11px">12</div>
+
+<div class="cell" style="font-size:11px">12</div>
+
+<div class="cell" style="font-size:11px">12</div>
+
+</div>
+</div>
+
+<div style="height:40px;display:flex;align-items:flex-end"><input class="in" placeholder="Add a habit…" aria-label="Add a habit"><button class="pill">+ HABIT</button></div>
+
+<div style="margin-top:20px;display:flex;flex-wrap:wrap;gap:0 8px;align-items:flex-start;height:40px">
+<span class="chip" style="background:var(--hiFill);border-radius:11px 9px 10px 8px;transform:rotate(-.8deg)">120 X'S THIS MONTH</span>
+<span class="chip" style="border-radius:9px 11px 8px 10px;transform:rotate(.6deg)">BEST STREAK 4 DAYS</span>
+<span class="chip" style="border-radius:10px 8px 11px 9px;transform:rotate(-.5deg)">TODAY 4/10 DONE</span>
+</div>
+
+</div>
+
+<nav class="bar" aria-label="Tabs">
+<button class="tab"><span>JOURNAL</span></button>
+<button class="tab on"><span>HABITS</span></button>
+<button class="tab"><span>SLEEP</span></button>
+<button class="tab pf" aria-label="Profile"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="11"/><circle cx="12" cy="10" r="3.5"/><path d="M5.5 19c1-4 4-5 6.5-5s5.5 1 6.5 5"/></svg></button>
+</nav>
+</div>
+</div></section>
+<section class="board"><h2>Sleep</h2><div id="bSleepdchtml" style="width:400px;height:880px">
+
+<div style="width:400px;height:880px;position:relative;overflow:hidden;font-family:Kalam,cursive;color:var(--ink);text-transform:uppercase;background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px),linear-gradient(var(--p1),var(--p2));background-size:20px 20px,20px 20px,100% 100%;--p1:#FDFCF8;--p2:#F1EFE8;--ink:rgb(35,36,31);--i65:rgba(35,36,31,0.65);--i60:rgba(35,36,31,0.6);--i50:rgba(35,36,31,0.5);--i40:rgba(35,36,31,0.4);--i30:rgba(35,36,31,0.3);--grid:rgba(96,98,72,.2);--hi:#B6FF2E;--hiFill:rgba(182,255,46,0.4);--hiSoft:rgba(182,255,46,0.26);--onHi:#23241F;--barA:rgba(253,252,248,.5);--barB:rgba(241,239,232,.95);">
+<div style="padding:40px 20px 0">
+
+<div style="height:80px;display:flex;align-items:flex-end;justify-content:space-between">
+<div>
+<h1 style="margin:0;display:inline-block;font-family:Caveat,cursive;font-weight:700;font-size:34px;line-height:40px;letter-spacing:.5px;white-space:nowrap;box-shadow:0 2px 0 var(--ink)">AUGUST 2026</h1>
+<div style="font-size:12px;line-height:20px;letter-spacing:.4px;opacity:.6">DAY 28 · IN PROGRESS</div>
+</div>
+<div style="display:flex;gap:4px">
+<button class="nav" aria-label="Previous month" style="border-radius:14px 4px 13px 5px">&lt;</button>
+<button class="nav" aria-label="Next month" disabled style="border-radius:5px 13px 4px 14px;opacity:.3">&gt;</button>
+</div>
+</div>
+
+<div style="height:40px;display:flex;align-items:flex-end;gap:8px"><span class="sh">SLEEP</span><span class="sm">AVG 7.1H</span></div>
+
+<div style="display:flex;height:20px">
+<div style="width:20px;flex:none"></div>
+<div style="width:280px;flex:none;position:relative">
+<span class="tk" style="left:4%">4</span><span class="tk" style="left:19.333333333333332%">5</span><span class="tk" style="left:34.666666666666664%">6</span><span class="tk" style="left:50%">7</span><span class="tk" style="left:65.33333333333333%">8</span><span class="tk" style="left:80.66666666666667%">9</span><span class="tk" style="left:96%">10</span>
+</div>
+<div style="width:40px;flex:none;text-align:right;font-size:10px;line-height:20px;opacity:.6">SCORE</div>
+</div>
+
+<div style="display:flex">
+<div style="width:20px;flex:none">
+<div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">1</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">2</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">3</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">4</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">5</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">6</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">7</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">8</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">9</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">10</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">11</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">12</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">13</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">14</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">15</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">16</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">17</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">18</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">19</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">20</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">21</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">22</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">23</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">24</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">25</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">26</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">27</div><div style="height:20px;text-align:right;padding-right:3px;font-size:11px;line-height:20px;opacity:.65">28</div>
+</div>
+<div style="width:280px;height:560px;flex:none;position:relative;box-shadow:inset 2px 0 0 var(--ink),inset -2px 0 0 var(--ink)">
+<div style="position:absolute;left:0;right:0;top:540px;height:20px;background:var(--hiSoft)"></div>
+<svg width="280" height="560" viewBox="0 0 280 560" style="position:absolute;left:0;top:0" aria-label="Hours slept each night">
+<polyline points="148.6,10 131.4,30 161.5,50 101.4,70 178.6,90 191.5,110 140,130 114.2,150 92.8,170 152.9,190 165.8,210 127.1,230 200.1,250 144.3,270 109.9,290 174.3,310 157.2,330 97.1,350 148.6,370 182.9,390 161.5,410 122.8,430 144.3,450 170.1,470 135.7,490 152.9,510 105.7,530 157.2,550" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="148.6" cy="10" r="4" fill="var(--ink)"/><circle cx="131.4" cy="30" r="4" fill="var(--ink)"/><circle cx="161.5" cy="50" r="4" fill="var(--ink)"/><circle cx="101.4" cy="70" r="4" fill="var(--ink)"/><circle cx="178.6" cy="90" r="4" fill="var(--ink)"/><circle cx="191.5" cy="110" r="4" fill="var(--ink)"/><circle cx="140" cy="130" r="4" fill="var(--ink)"/><circle cx="114.2" cy="150" r="4" fill="var(--ink)"/><circle cx="92.8" cy="170" r="4" fill="var(--ink)"/><circle cx="152.9" cy="190" r="4" fill="var(--ink)"/><circle cx="165.8" cy="210" r="4" fill="var(--ink)"/><circle cx="127.1" cy="230" r="4" fill="var(--ink)"/><circle cx="200.1" cy="250" r="4" fill="var(--ink)"/><circle cx="144.3" cy="270" r="4" fill="var(--ink)"/><circle cx="109.9" cy="290" r="4" fill="var(--ink)"/><circle cx="174.3" cy="310" r="4" fill="var(--ink)"/><circle cx="157.2" cy="330" r="4" fill="var(--ink)"/><circle cx="97.1" cy="350" r="4" fill="var(--ink)"/><circle cx="148.6" cy="370" r="4" fill="var(--ink)"/><circle cx="182.9" cy="390" r="4" fill="var(--ink)"/><circle cx="161.5" cy="410" r="4" fill="var(--ink)"/><circle cx="122.8" cy="430" r="4" fill="var(--ink)"/><circle cx="144.3" cy="450" r="4" fill="var(--ink)"/><circle cx="170.1" cy="470" r="4" fill="var(--ink)"/><circle cx="135.7" cy="490" r="4" fill="var(--ink)"/><circle cx="152.9" cy="510" r="4" fill="var(--ink)"/><circle cx="105.7" cy="530" r="4" fill="var(--ink)"/><circle cx="157.2" cy="550" r="4" fill="var(--ink)"/>
+</svg>
+</div>
+<div style="width:40px;flex:none">
+<div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">77</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">73</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">80</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">66</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">84</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">87</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">75</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">69</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">64</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">78</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">81</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">72</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">89</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">76</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">68</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">83</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">79</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">65</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">77</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">85</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">80</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">71</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">76</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">82</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">74</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">78</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">67</div><div style="height:20px;text-align:right;font-size:11px;line-height:20px;opacity:.75">79</div>
+</div>
+</div>
+
+<div style="margin-top:20px;height:40px;padding:0 12px;border:1.5px solid var(--ink);background:var(--hiFill);border-radius:12px 9px 11px 10px;transform:rotate(-.6deg)">
+<div style="font-size:14px;line-height:20px;padding-top:0">AUG 28 · 7.4H · SCORE 79</div>
+<div style="font-size:12px;line-height:17px;opacity:.75">DECENT. COULD GO TO BED EARLIER.</div>
+</div>
+
+</div>
+
+<nav class="bar" aria-label="Tabs">
+<button class="tab"><span>JOURNAL</span></button>
+<button class="tab"><span>HABITS</span></button>
+<button class="tab on"><span>SLEEP</span></button>
+<button class="tab pf" aria-label="Profile"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="11"/><circle cx="12" cy="10" r="3.5"/><path d="M5.5 19c1-4 4-5 6.5-5s5.5 1 6.5 5"/></svg></button>
+</nav>
+</div>
+</div></section>
+<section class="board"><h2>Profile</h2><div id="bProfiledchtml" style="width:400px;height:880px">
+
+<div style="width:400px;height:880px;position:relative;overflow:hidden;font-family:Kalam,cursive;color:var(--ink);text-transform:uppercase;background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px),linear-gradient(var(--p1),var(--p2));background-size:20px 20px,20px 20px,100% 100%;--p1:#FDFCF8;--p2:#F1EFE8;--ink:rgb(35,36,31);--i65:rgba(35,36,31,0.65);--i60:rgba(35,36,31,0.6);--i50:rgba(35,36,31,0.5);--i40:rgba(35,36,31,0.4);--i30:rgba(35,36,31,0.3);--grid:rgba(96,98,72,.2);--hi:#B6FF2E;--hiFill:rgba(182,255,46,0.4);--hiSoft:rgba(182,255,46,0.26);--onHi:#23241F;--barA:rgba(253,252,248,.5);--barB:rgba(241,239,232,.95);">
+<div style="padding:40px 20px 0">
+
+<div style="height:80px;display:flex;align-items:flex-end;justify-content:space-between">
+<div>
+<h1 style="margin:0;display:inline-block;font-family:Caveat,cursive;font-weight:700;font-size:34px;line-height:40px;letter-spacing:.5px;white-space:nowrap;box-shadow:0 2px 0 var(--ink)">AUGUST 2026</h1>
+<div style="font-size:12px;line-height:20px;letter-spacing:.4px;opacity:.6">DAY 28 · IN PROGRESS</div>
+</div>
+<div style="display:flex;gap:4px">
+<button class="nav" aria-label="Previous month" style="border-radius:14px 4px 13px 5px">&lt;</button>
+<button class="nav" aria-label="Next month" disabled style="border-radius:5px 13px 4px 14px;opacity:.3">&gt;</button>
+</div>
+</div>
+
+<div style="height:40px;display:flex;align-items:flex-end;gap:8px"><span class="sh">ME</span><span class="sm">SINCE JUNE 2025</span></div>
+
+<div style="height:80px;display:flex;align-items:center;gap:16px">
+<svg width="60" height="60" viewBox="0 0 60 60" aria-hidden="true" style="flex:none"><circle cx="30" cy="30" r="29" fill="var(--hiFill)" stroke="var(--ink)" stroke-width="2"/><circle cx="30" cy="25" r="8.5" fill="none" stroke="var(--ink)" stroke-width="2"/><path d="M13 49c2-10 10-13 17-13s15 3 17 13" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/></svg>
+<div>
+<div style="font-family:Caveat,cursive;font-weight:700;font-size:28px;line-height:40px">YOUR NAME</div>
+<div style="font-size:13px;line-height:20px;opacity:.65">14 NOTEBOOKS · 428 ENTRIES</div>
+</div>
+</div>
+
+<div class="r"><span>BEST STREAK, AUG</span><span class="lead"></span><span class="val">9 DAYS</span></div>
+<div class="r"><span>X'S IN AUG</span><span class="lead"></span><span class="val">124</span></div>
+<div class="r"><span>MOMENTS IN AUG</span><span class="lead"></span><span class="val">3</span></div>
+<div class="r"><span>AVG SLEEP, AUG</span><span class="lead"></span><span class="val">7.1H</span></div>
+<div class="r"><span>MONTHS KEPT</span><span class="lead"></span><span class="val">14</span></div>
+
+<div style="height:20px;margin-top:20px;font-size:13px;line-height:20px;opacity:.6">SETTINGS</div>
+<div class="r"><span>PAGE COLOR · WHITE</span></div>
+<div style="height:40px;display:flex;align-items:center;gap:8px">
+<span style="width:48px;font-size:14px">PAPER</span>
+<div style="display:flex;gap:4px">
+<span class="sw" style="background:#FDFCF8;border-radius:3px 4px 3px 5px;border-width:2px"></span>
+<span class="sw" style="background:#24261F;border-radius:4px 3px 5px 3px"></span>
+<span class="sw" style="background:#F3E4B8;border-radius:3px 5px 3px 4px"></span>
+<span class="sw" style="background:#FBF3A5;border-radius:5px 3px 4px 3px"></span>
+<span class="sw" style="background:#D9BC8C;border-radius:3px 4px 3px 5px"></span>
+<span class="sw" style="background:#E4F0D8;border-radius:4px 3px 5px 3px"></span>
+<span class="sw" style="background:#E3EEF8;border-radius:3px 5px 3px 4px"></span>
+<span class="sw" style="background:#1E3A6E;border-radius:5px 3px 4px 3px"></span>
+</div>
+</div>
+<div class="r"><span class="box">✕</span>NIGHTLY REMINDER 9:30PM</div>
+<div class="r"><span class="box">✕</span>WEEK STARTS MONDAY</div>
+<div class="r"><span class="box">✕</span>SYNC SLEEP FROM WATCH</div>
+<div class="r"><span class="box"></span>SHOW WEIGHT COLUMN</div>
+
+<div class="card" style="margin-top:20px;border-radius:12px 9px 11px 10px;transform:rotate(-.5deg)">
+<div style="font-size:14px;line-height:20px">SEE YOUR PROGRESS</div>
+<div style="font-size:12px;line-height:18px;opacity:.75">STREAKS, CHARTS &amp; TRENDS</div>
+</div>
+<div class="card" style="margin-top:20px;border-radius:10px 12px 9px 11px;transform:rotate(.5deg)">
+<div style="font-size:14px;line-height:20px">EXPORT AUGUST AS PDF</div>
+<div style="font-size:12px;line-height:18px;opacity:.75">PRINTS ON GRID PAPER, 1:1</div>
+</div>
+
+</div>
+
+<nav class="bar" aria-label="Tabs">
+<button class="tab"><span>JOURNAL</span></button>
+<button class="tab"><span>HABITS</span></button>
+<button class="tab"><span>SLEEP</span></button>
+<button class="tab pf on" aria-label="Profile" style="background:var(--hi);border-radius:12px 9px 11px 10px;height:30px;margin-top:7px;color:var(--onHi)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="11"/><circle cx="12" cy="10" r="3.5"/><path d="M5.5 19c1-4 4-5 6.5-5s5.5 1 6.5 5"/></svg></button>
+</nav>
+</div>
+</div></section>
+<section class="board"><h2>Progress</h2><div id="bProgressdchtml" style="width:400px;height:980px">
+
+<div style="width:400px;height:980px;position:relative;overflow:hidden;font-family:Kalam,cursive;color:var(--ink);text-transform:uppercase;background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px),linear-gradient(var(--p1),var(--p2));background-size:20px 20px,20px 20px,100% 100%;--p1:#FDFCF8;--p2:#F1EFE8;--ink:rgb(35,36,31);--i65:rgba(35,36,31,0.65);--i60:rgba(35,36,31,0.6);--i50:rgba(35,36,31,0.5);--i40:rgba(35,36,31,0.4);--i30:rgba(35,36,31,0.3);--grid:rgba(96,98,72,.2);--hi:#B6FF2E;--hiFill:rgba(182,255,46,0.4);--hiSoft:rgba(182,255,46,0.26);--onHi:#23241F;--barA:rgba(253,252,248,.5);--barB:rgba(241,239,232,.95);">
+<div style="padding:40px 20px 0">
+
+<div style="height:80px;display:flex;align-items:flex-end;justify-content:space-between">
+<div>
+<h1 style="margin:0;display:inline-block;font-family:Caveat,cursive;font-weight:700;font-size:34px;line-height:40px;letter-spacing:.5px;white-space:nowrap;box-shadow:0 2px 0 var(--ink)">PROGRESS</h1>
+<div style="font-size:12px;line-height:20px;letter-spacing:.4px;opacity:.6">ALL-TIME · SINCE JUN 2025</div>
+</div>
+<button class="nav" aria-label="Back" style="border-radius:14px 4px 13px 5px">&lt;</button>
+</div>
+
+<div style="margin-top:20px;height:40px;display:flex;flex-wrap:wrap;gap:0 8px;align-items:flex-start">
+<span class="chip" style="background:var(--hiFill);border-radius:11px 9px 10px 8px;transform:rotate(-.8deg)">14 NOTEBOOKS KEPT</span>
+<span class="chip" style="border-radius:9px 11px 8px 10px;transform:rotate(.6deg)">1,186 X'S ALL TIME</span>
+<span class="chip" style="border-radius:10px 8px 11px 9px;transform:rotate(-.5deg)">21 DAY LONGEST STREAK</span>
+</div>
+
+<div style="height:60px;padding-top:20px;display:flex;align-items:flex-end;gap:8px"><span class="sh">CONSISTENCY</span><span class="sm">LAST 14 WEEKS</span></div>
+<div style="display:flex;height:140px">
+<div style="width:20px;flex:none">
+<div style="height:20px;font-size:10px;line-height:20px;opacity:.6;text-align:center">M</div><div style="height:20px;font-size:10px;line-height:20px;opacity:.6;text-align:center"></div><div style="height:20px;font-size:10px;line-height:20px;opacity:.6;text-align:center">W</div><div style="height:20px;font-size:10px;line-height:20px;opacity:.6;text-align:center"></div><div style="height:20px;font-size:10px;line-height:20px;opacity:.6;text-align:center">F</div><div style="height:20px;font-size:10px;line-height:20px;opacity:.6;text-align:center"></div><div style="height:20px;font-size:10px;line-height:20px;opacity:.6;text-align:center">S</div>
+</div>
+
+<div style="width:20px;flex:none">
+<div class="hc"><i style="background:transparent"></i></div><div class="hc"><i style="background:transparent"></i></div><div class="hc"><i style="background:transparent"></i></div><div class="hc"><i style="background:transparent"></i></div><div class="hc"><i style="background:transparent"></i></div><div class="hc"><i style="background:transparent"></i></div><div class="hc"><i style="background:transparent"></i></div>
+</div>
+
+<div style="width:20px;flex:none">
+<div class="hc"><i style="background:rgba(182,255,46,.8)"></i></div><div class="hc"><i style="background:#B6FF2E"></i></div><div class="hc"><i style="background:transparent"></i></div><div class="hc"><i style="background:rgba(182,255,46,.8)"></i></div><div class="hc"><i style="background:#B6FF2E"></i></div><div class="hc"><i style="background:transparent"></i></div><div class="hc"><i style="background:rgba(182,255,46,.8)"></i></div>
+</div>
+
+<div style="width:20px;flex:none">
+<div class="hc"><i style="background:rgba(182,255,46,.3)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.8)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.55)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.3)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.8)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.55)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.3)"></i></div>
+</div>
+
+<div style="width:20px;flex:none">
+<div class="hc"><i style="background:#B6FF2E"></i></div><div class="hc"><i style="background:#B6FF2E"></i></div><div class="hc"><i style="background:#B6FF2E"></i></div><div class="hc"><i style="background:#B6FF2E"></i></div><div class="hc"><i style="background:#B6FF2E"></i></div><div class="hc"><i style="background:#B6FF2E"></i></div><div class="hc"><i style="background:#B6FF2E"></i></div>
+</div>
+
+<div style="width:20px;flex:none">
+<div class="hc"><i style="background:rgba(182,255,46,.55)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.8)"></i></div><div class="hc"><i style="background:#B6FF2E"></i></div><div class="hc"><i style="background:rgba(182,255,46,.55)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.8)"></i></div><div class="hc"><i style="background:#B6FF2E"></i></div><div class="hc"><i style="background:rgba(182,255,46,.55)"></i></div>
+</div>
+
+<div style="width:20px;flex:none">
+<div class="hc"><i style="background:transparent"></i></div><div class="hc"><i style="background:rgba(182,255,46,.55)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.3)"></i></div><div class="hc"><i style="background:transparent"></i></div><div class="hc"><i style="background:rgba(182,255,46,.55)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.3)"></i></div><div class="hc"><i style="background:transparent"></i></div>
+</div>
+
+<div style="width:20px;flex:none">
+<div class="hc"><i style="background:rgba(182,255,46,.8)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.8)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.8)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.8)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.8)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.8)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.8)"></i></div>
+</div>
+
+<div style="width:20px;flex:none">
+<div class="hc"><i style="background:rgba(182,255,46,.3)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.55)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.8)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.3)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.55)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.8)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.3)"></i></div>
+</div>
+
+<div style="width:20px;flex:none">
+<div class="hc"><i style="background:#B6FF2E"></i></div><div class="hc"><i style="background:rgba(182,255,46,.3)"></i></div><div class="hc"><i style="background:transparent"></i></div><div class="hc"><i style="background:#B6FF2E"></i></div><div class="hc"><i style="background:rgba(182,255,46,.3)"></i></div><div class="hc"><i style="background:transparent"></i></div><div class="hc"><i style="background:#B6FF2E"></i></div>
+</div>
+
+<div style="width:20px;flex:none">
+<div class="hc"><i style="background:rgba(182,255,46,.55)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.55)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.55)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.55)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.55)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.55)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.55)"></i></div>
+</div>
+
+<div style="width:20px;flex:none">
+<div class="hc"><i style="background:transparent"></i></div><div class="hc"><i style="background:rgba(182,255,46,.3)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.55)"></i></div><div class="hc"><i style="background:transparent"></i></div><div class="hc"><i style="background:rgba(182,255,46,.3)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.55)"></i></div><div class="hc"><i style="background:transparent"></i></div>
+</div>
+
+<div style="width:20px;flex:none">
+<div class="hc"><i style="background:rgba(182,255,46,.8)"></i></div><div class="hc"><i style="background:transparent"></i></div><div class="hc"><i style="background:#B6FF2E"></i></div><div class="hc"><i style="background:rgba(182,255,46,.8)"></i></div><div class="hc"><i style="background:transparent"></i></div><div class="hc"><i style="background:#B6FF2E"></i></div><div class="hc"><i style="background:rgba(182,255,46,.8)"></i></div>
+</div>
+
+<div style="width:20px;flex:none">
+<div class="hc"><i style="background:rgba(182,255,46,.3)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.3)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.3)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.3)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.3)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.3)"></i></div><div class="hc"><i style="background:rgba(182,255,46,.3)"></i></div>
+</div>
+
+<div style="width:20px;flex:none">
+<div class="hc"><i style="background:#B6FF2E"></i></div><div class="hc"><i style="background:transparent"></i></div><div class="hc"><i style="background:rgba(182,255,46,.3)"></i></div><div class="hc"><i style="background:#B6FF2E"></i></div><div class="hc"><i style="background:transparent"></i></div><div class="hc"><i style="background:rgba(182,255,46,.3)"></i></div><div class="hc"><i style="background:#B6FF2E"></i></div>
+</div>
+
+</div>
+
+<div style="height:60px;padding-top:20px;display:flex;align-items:flex-end;gap:8px"><span class="sh">MONTHLY X'S</span><span class="sm">LAST 6 MONTHS</span></div>
+<div style="display:flex;height:120px">
+
+<div style="width:60px;flex:none;position:relative">
+<span style="position:absolute;left:0;right:0;text-align:center;font-size:11px;line-height:20px;bottom:86px">96</span>
+<div style="position:absolute;left:16px;width:28px;bottom:20px;height:62px;border:1.5px solid var(--ink);border-radius:5px 4px 3px 3px;background:repeating-linear-gradient(135deg,var(--i30) 0 1px,transparent 1px 5px)"></div>
+<span style="position:absolute;left:0;right:0;bottom:0;text-align:center;font-size:11px;line-height:20px;opacity:.7">MAR</span>
+</div>
+
+<div style="width:60px;flex:none;position:relative">
+<span style="position:absolute;left:0;right:0;text-align:center;font-size:11px;line-height:20px;bottom:94px">108</span>
+<div style="position:absolute;left:16px;width:28px;bottom:20px;height:70px;border:1.5px solid var(--ink);border-radius:5px 4px 3px 3px;background:repeating-linear-gradient(135deg,var(--i30) 0 1px,transparent 1px 5px)"></div>
+<span style="position:absolute;left:0;right:0;bottom:0;text-align:center;font-size:11px;line-height:20px;opacity:.7">APR</span>
+</div>
+
+<div style="width:60px;flex:none;position:relative">
+<span style="position:absolute;left:0;right:0;text-align:center;font-size:11px;line-height:20px;bottom:90px">102</span>
+<div style="position:absolute;left:16px;width:28px;bottom:20px;height:66px;border:1.5px solid var(--ink);border-radius:5px 4px 3px 3px;background:repeating-linear-gradient(135deg,var(--i30) 0 1px,transparent 1px 5px)"></div>
+<span style="position:absolute;left:0;right:0;bottom:0;text-align:center;font-size:11px;line-height:20px;opacity:.7">MAY</span>
+</div>
+
+<div style="width:60px;flex:none;position:relative">
+<span style="position:absolute;left:0;right:0;text-align:center;font-size:11px;line-height:20px;bottom:100px">118</span>
+<div style="position:absolute;left:16px;width:28px;bottom:20px;height:76px;border:1.5px solid var(--ink);border-radius:5px 4px 3px 3px;background:repeating-linear-gradient(135deg,var(--i30) 0 1px,transparent 1px 5px)"></div>
+<span style="position:absolute;left:0;right:0;bottom:0;text-align:center;font-size:11px;line-height:20px;opacity:.7">JUN</span>
+</div>
+
+<div style="width:60px;flex:none;position:relative">
+<span style="position:absolute;left:0;right:0;text-align:center;font-size:11px;line-height:20px;bottom:96px">111</span>
+<div style="position:absolute;left:16px;width:28px;bottom:20px;height:72px;border:1.5px solid var(--ink);border-radius:5px 4px 3px 3px;background:repeating-linear-gradient(135deg,var(--i30) 0 1px,transparent 1px 5px)"></div>
+<span style="position:absolute;left:0;right:0;bottom:0;text-align:center;font-size:11px;line-height:20px;opacity:.7">JUL</span>
+</div>
+
+<div style="width:60px;flex:none;position:relative">
+<span style="position:absolute;left:0;right:0;text-align:center;font-size:11px;line-height:20px;bottom:104px">124</span>
+<div style="position:absolute;left:16px;width:28px;bottom:20px;height:80px;border:1.5px solid var(--ink);border-radius:5px 4px 3px 3px;background:var(--hiFill)"></div>
+<span style="position:absolute;left:0;right:0;bottom:0;text-align:center;font-size:11px;line-height:20px;opacity:.7">AUG</span>
+</div>
+
+</div>
+
+<div style="height:60px;padding-top:20px;display:flex;align-items:flex-end;gap:8px"><span class="sh">BEST STREAKS</span><span class="sm">ALL TIME</span></div>
+
+<div style="height:20px;display:flex;align-items:center;font-size:14px;line-height:20px;letter-spacing:.2px">
+<span style="width:130px;flex:none;white-space:nowrap">EXERCISE</span>
+<span style="display:block;height:10px;width:150px;border:1.5px solid var(--ink);background:var(--hiFill);border-radius:4px 3px 4px 3px"></span>
+<span style="margin-left:auto;font-size:11px">21 D</span>
+</div>
+
+<div style="height:20px;display:flex;align-items:center;font-size:14px;line-height:20px;letter-spacing:.2px">
+<span style="width:130px;flex:none;white-space:nowrap">MEDITATION</span>
+<span style="display:block;height:10px;width:114px;border:1.5px solid var(--ink);background:var(--hiFill);border-radius:4px 3px 4px 3px"></span>
+<span style="margin-left:auto;font-size:11px">16 D</span>
+</div>
+
+<div style="height:20px;display:flex;align-items:center;font-size:14px;line-height:20px;letter-spacing:.2px">
+<span style="width:130px;flex:none;white-space:nowrap">JOURNAL</span>
+<span style="display:block;height:10px;width:100px;border:1.5px solid var(--ink);background:var(--hiFill);border-radius:4px 3px 4px 3px"></span>
+<span style="margin-left:auto;font-size:11px">14 D</span>
+</div>
+
+<div style="height:20px;display:flex;align-items:center;font-size:14px;line-height:20px;letter-spacing:.2px">
+<span style="width:130px;flex:none;white-space:nowrap">COLD EXPOSURE</span>
+<span style="display:block;height:10px;width:79px;border:1.5px solid var(--ink);background:var(--hiFill);border-radius:4px 3px 4px 3px"></span>
+<span style="margin-left:auto;font-size:11px">11 D</span>
+</div>
+
+<div style="height:20px;display:flex;align-items:center;font-size:14px;line-height:20px;letter-spacing:.2px">
+<span style="width:130px;flex:none;white-space:nowrap">READ 5 PAGES</span>
+<span style="display:block;height:10px;width:64px;border:1.5px solid var(--ink);background:var(--hiFill);border-radius:4px 3px 4px 3px"></span>
+<span style="margin-left:auto;font-size:11px">9 D</span>
+</div>
+
+
+<div style="height:60px;padding-top:20px;display:flex;align-items:flex-end;gap:8px"><span class="sh">SLEEP TREND</span><span class="sm">AVG HOURS / MONTH</span></div>
+<div style="height:100px;position:relative">
+<svg width="360" height="100" viewBox="0 0 360 100" style="position:absolute;left:0;top:0" aria-label="Average hours slept per month">
+<polyline points="30,58 90,50 150,54 210,38 270,46 330,46" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="30" cy="58" r="4" fill="var(--ink)"/><circle cx="90" cy="50" r="4" fill="var(--ink)"/><circle cx="150" cy="54" r="4" fill="var(--ink)"/><circle cx="210" cy="38" r="4" fill="var(--ink)"/><circle cx="270" cy="46" r="4" fill="var(--ink)"/><circle cx="330" cy="46" r="4" fill="var(--ink)"/>
+</svg>
+</div>
+<div style="display:flex;height:20px">
+<span style="width:60px;flex:none;text-align:center;font-size:11px;line-height:20px;opacity:.7">MAR</span><span style="width:60px;flex:none;text-align:center;font-size:11px;line-height:20px;opacity:.7">APR</span><span style="width:60px;flex:none;text-align:center;font-size:11px;line-height:20px;opacity:.7">MAY</span><span style="width:60px;flex:none;text-align:center;font-size:11px;line-height:20px;opacity:.7">JUN</span><span style="width:60px;flex:none;text-align:center;font-size:11px;line-height:20px;opacity:.7">JUL</span><span style="width:60px;flex:none;text-align:center;font-size:11px;line-height:20px;opacity:.7">AUG</span>
+</div>
+
+</div>
+
+<nav class="bar" aria-label="Tabs">
+<button class="tab"><span>JOURNAL</span></button>
+<button class="tab"><span>HABITS</span></button>
+<button class="tab"><span>SLEEP</span></button>
+<button class="tab pf" aria-label="Profile" style="background:var(--hi);border-radius:12px 9px 11px 10px;height:30px;margin-top:7px;color:var(--onHi)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="11"/><circle cx="12" cy="10" r="3.5"/><path d="M5.5 19c1-4 4-5 6.5-5s5.5 1 6.5 5"/></svg></button>
+</nav>
+</div>
+</div></section>
+<section class="board"><h2>Notebook papers and markers</h2><div id="bPapersdchtml" style="width:900px;height:700px">
+
+<div style="width:900px;height:700px;position:relative;overflow:hidden;padding:20px;font-family:Kalam,cursive;text-transform:uppercase;color:#23241F;background-image:linear-gradient(to right,rgba(96,98,72,.2) 1px,transparent 1px),linear-gradient(to bottom,rgba(96,98,72,.2) 1px,transparent 1px),linear-gradient(#FDFCF8,#F1EFE8);background-size:20px 20px,20px 20px,100% 100%">
+
+<div style="height:60px">
+<h1 style="margin:0;display:inline-block;font-family:Caveat,cursive;font-weight:700;font-size:34px;line-height:40px;letter-spacing:.5px;box-shadow:0 2px 0 #23241F">NOTEBOOK PAPERS</h1>
+<div style="font-size:12px;line-height:20px;letter-spacing:.4px;opacity:.6">8 COLORWAYS · SAME 20 PX GRID · NEON IS THE ONLY ACCENT</div>
+</div>
+
+<div style="margin-top:20px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px">
+
+<div style="height:240px;position:relative;overflow:hidden;color:var(--ink);border:2px solid var(--ink);border-radius:12px 9px 11px 10px;--ink:rgb(35,36,31);--hi:#B6FF2E;--hiFill:rgba(182,255,46,0.4);--onHi:#23241F;background-image:linear-gradient(to right,rgba(96,98,72,.2) 1px,transparent 1px),linear-gradient(to bottom,rgba(96,98,72,.2) 1px,transparent 1px),linear-gradient(#FDFCF8,#F1EFE8);background-size:20px 20px,20px 20px,100% 100%">
+<div style="height:60px;padding-top:20px"><span style="display:inline-block;font-family:Caveat,cursive;font-weight:700;font-size:28px;line-height:40px;letter-spacing:.5px;box-shadow:0 2px 0 var(--ink)">AUG 2026</span></div>
+<div style="height:20px;font-size:12px;line-height:20px;letter-spacing:.4px;opacity:.6">WHITE</div>
+<div style="height:20px"></div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px"><span style="width:20px;text-align:center;font-size:12px">□</span>PLAN SEPT BLOCK</div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px"><span style="width:20px;text-align:center;font-size:12px">□</span>BOOK THE DENTIST</div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px;opacity:.42"><span style="width:20px;text-align:center">✕</span><span style="text-decoration:line-through">CALL MUM BACK</span></div>
+<div style="height:20px"></div>
+<div style="height:20px;display:flex;font-size:16px;line-height:20px;opacity:.85"><span style="width:20px;text-align:center">✕</span><span style="width:20px;text-align:center">×</span><span style="width:20px"></span><span style="width:20px;text-align:center">✗</span><span style="width:20px;text-align:center">✕</span><span style="width:20px"></span></div>
+<div style="height:20px;display:flex;align-items:center;justify-content:space-between;padding-right:20px">
+<span style="margin-left:20px;height:20px;padding:0 10px;border:1.5px solid var(--ink);border-radius:11px 9px 10px 10px;background:var(--hiFill);font-size:11px;line-height:17px">4 OPEN</span>
+<span style="height:17px;padding:0 10px;background:var(--hi);color:var(--onHi);border-radius:9px 6px 10px 7px;transform:rotate(-1deg);font-size:11px;line-height:17px;font-weight:700">HABITS</span>
+</div>
+</div>
+
+<div style="height:240px;position:relative;overflow:hidden;color:var(--ink);border:2px solid var(--ink);border-radius:9px 12px 10px 11px;--ink:rgb(240,234,214);--hi:#B6FF2E;--hiFill:rgba(182,255,46,0.28);--onHi:#1B1D17;background-image:linear-gradient(to right,rgba(214,226,178,.16) 1px,transparent 1px),linear-gradient(to bottom,rgba(214,226,178,.16) 1px,transparent 1px),linear-gradient(#24261F,#191B16);background-size:20px 20px,20px 20px,100% 100%">
+<div style="height:60px;padding-top:20px"><span style="display:inline-block;font-family:Caveat,cursive;font-weight:700;font-size:28px;line-height:40px;letter-spacing:.5px;box-shadow:0 2px 0 var(--ink)">AUG 2026</span></div>
+<div style="height:20px;font-size:12px;line-height:20px;letter-spacing:.4px;opacity:.6">BLACK</div>
+<div style="height:20px"></div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px"><span style="width:20px;text-align:center;font-size:12px">□</span>PLAN SEPT BLOCK</div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px"><span style="width:20px;text-align:center;font-size:12px">□</span>BOOK THE DENTIST</div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px;opacity:.42"><span style="width:20px;text-align:center">✕</span><span style="text-decoration:line-through">CALL MUM BACK</span></div>
+<div style="height:20px"></div>
+<div style="height:20px;display:flex;font-size:16px;line-height:20px;opacity:.85"><span style="width:20px;text-align:center">✕</span><span style="width:20px;text-align:center">×</span><span style="width:20px"></span><span style="width:20px;text-align:center">✗</span><span style="width:20px;text-align:center">✕</span><span style="width:20px"></span></div>
+<div style="height:20px;display:flex;align-items:center;justify-content:space-between;padding-right:20px">
+<span style="margin-left:20px;height:20px;padding:0 10px;border:1.5px solid var(--ink);border-radius:11px 9px 10px 10px;background:var(--hiFill);font-size:11px;line-height:17px">4 OPEN</span>
+<span style="height:17px;padding:0 10px;background:var(--hi);color:var(--onHi);border-radius:9px 6px 10px 7px;transform:rotate(-1deg);font-size:11px;line-height:17px;font-weight:700">HABITS</span>
+</div>
+</div>
+
+<div style="height:240px;position:relative;overflow:hidden;color:var(--ink);border:2px solid var(--ink);border-radius:11px 10px 12px 9px;--ink:rgb(58,46,26);--hi:#B6FF2E;--hiFill:rgba(182,255,46,0.4);--onHi:#23241F;background-image:linear-gradient(to right,rgba(139,107,46,.25) 1px,transparent 1px),linear-gradient(to bottom,rgba(139,107,46,.25) 1px,transparent 1px),linear-gradient(#F3E4B8,#E6D3A0);background-size:20px 20px,20px 20px,100% 100%">
+<div style="height:60px;padding-top:20px"><span style="display:inline-block;font-family:Caveat,cursive;font-weight:700;font-size:28px;line-height:40px;letter-spacing:.5px;box-shadow:0 2px 0 var(--ink)">AUG 2026</span></div>
+<div style="height:20px;font-size:12px;line-height:20px;letter-spacing:.4px;opacity:.6">OLD PAPER</div>
+<div style="height:20px"></div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px"><span style="width:20px;text-align:center;font-size:12px">□</span>PLAN SEPT BLOCK</div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px"><span style="width:20px;text-align:center;font-size:12px">□</span>BOOK THE DENTIST</div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px;opacity:.42"><span style="width:20px;text-align:center">✕</span><span style="text-decoration:line-through">CALL MUM BACK</span></div>
+<div style="height:20px"></div>
+<div style="height:20px;display:flex;font-size:16px;line-height:20px;opacity:.85"><span style="width:20px;text-align:center">✕</span><span style="width:20px;text-align:center">×</span><span style="width:20px"></span><span style="width:20px;text-align:center">✗</span><span style="width:20px;text-align:center">✕</span><span style="width:20px"></span></div>
+<div style="height:20px;display:flex;align-items:center;justify-content:space-between;padding-right:20px">
+<span style="margin-left:20px;height:20px;padding:0 10px;border:1.5px solid var(--ink);border-radius:11px 9px 10px 10px;background:var(--hiFill);font-size:11px;line-height:17px">4 OPEN</span>
+<span style="height:17px;padding:0 10px;background:var(--hi);color:var(--onHi);border-radius:9px 6px 10px 7px;transform:rotate(-1deg);font-size:11px;line-height:17px;font-weight:700">HABITS</span>
+</div>
+</div>
+
+<div style="height:240px;position:relative;overflow:hidden;color:var(--ink);border:2px solid var(--ink);border-radius:10px 11px 9px 12px;--ink:rgb(31,42,68);--hi:#B6FF2E;--hiFill:rgba(182,255,46,0.4);--onHi:#23241F;background-image:linear-gradient(to right,rgba(74,128,192,.33) 1px,transparent 1px),linear-gradient(to bottom,rgba(74,128,192,.33) 1px,transparent 1px),linear-gradient(#FBF3A5,#F2E88A);background-size:20px 20px,20px 20px,100% 100%">
+<div style="height:60px;padding-top:20px"><span style="display:inline-block;font-family:Caveat,cursive;font-weight:700;font-size:28px;line-height:40px;letter-spacing:.5px;box-shadow:0 2px 0 var(--ink)">AUG 2026</span></div>
+<div style="height:20px;font-size:12px;line-height:20px;letter-spacing:.4px;opacity:.6">LEGAL PAD</div>
+<div style="height:20px"></div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px"><span style="width:20px;text-align:center;font-size:12px">□</span>PLAN SEPT BLOCK</div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px"><span style="width:20px;text-align:center;font-size:12px">□</span>BOOK THE DENTIST</div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px;opacity:.42"><span style="width:20px;text-align:center">✕</span><span style="text-decoration:line-through">CALL MUM BACK</span></div>
+<div style="height:20px"></div>
+<div style="height:20px;display:flex;font-size:16px;line-height:20px;opacity:.85"><span style="width:20px;text-align:center">✕</span><span style="width:20px;text-align:center">×</span><span style="width:20px"></span><span style="width:20px;text-align:center">✗</span><span style="width:20px;text-align:center">✕</span><span style="width:20px"></span></div>
+<div style="height:20px;display:flex;align-items:center;justify-content:space-between;padding-right:20px">
+<span style="margin-left:20px;height:20px;padding:0 10px;border:1.5px solid var(--ink);border-radius:11px 9px 10px 10px;background:var(--hiFill);font-size:11px;line-height:17px">4 OPEN</span>
+<span style="height:17px;padding:0 10px;background:var(--hi);color:var(--onHi);border-radius:9px 6px 10px 7px;transform:rotate(-1deg);font-size:11px;line-height:17px;font-weight:700">HABITS</span>
+</div>
+</div>
+
+<div style="height:240px;position:relative;overflow:hidden;color:var(--ink);border:2px solid var(--ink);border-radius:12px 9px 11px 10px;--ink:rgb(43,33,24);--hi:#B6FF2E;--hiFill:rgba(182,255,46,0.4);--onHi:#23241F;background-image:linear-gradient(to right,rgba(90,65,38,.25) 1px,transparent 1px),linear-gradient(to bottom,rgba(90,65,38,.25) 1px,transparent 1px),linear-gradient(#D9BC8C,#C8A874);background-size:20px 20px,20px 20px,100% 100%">
+<div style="height:60px;padding-top:20px"><span style="display:inline-block;font-family:Caveat,cursive;font-weight:700;font-size:28px;line-height:40px;letter-spacing:.5px;box-shadow:0 2px 0 var(--ink)">AUG 2026</span></div>
+<div style="height:20px;font-size:12px;line-height:20px;letter-spacing:.4px;opacity:.6">KRAFT</div>
+<div style="height:20px"></div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px"><span style="width:20px;text-align:center;font-size:12px">□</span>PLAN SEPT BLOCK</div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px"><span style="width:20px;text-align:center;font-size:12px">□</span>BOOK THE DENTIST</div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px;opacity:.42"><span style="width:20px;text-align:center">✕</span><span style="text-decoration:line-through">CALL MUM BACK</span></div>
+<div style="height:20px"></div>
+<div style="height:20px;display:flex;font-size:16px;line-height:20px;opacity:.85"><span style="width:20px;text-align:center">✕</span><span style="width:20px;text-align:center">×</span><span style="width:20px"></span><span style="width:20px;text-align:center">✗</span><span style="width:20px;text-align:center">✕</span><span style="width:20px"></span></div>
+<div style="height:20px;display:flex;align-items:center;justify-content:space-between;padding-right:20px">
+<span style="margin-left:20px;height:20px;padding:0 10px;border:1.5px solid var(--ink);border-radius:11px 9px 10px 10px;background:var(--hiFill);font-size:11px;line-height:17px">4 OPEN</span>
+<span style="height:17px;padding:0 10px;background:var(--hi);color:var(--onHi);border-radius:9px 6px 10px 7px;transform:rotate(-1deg);font-size:11px;line-height:17px;font-weight:700">HABITS</span>
+</div>
+</div>
+
+<div style="height:240px;position:relative;overflow:hidden;color:var(--ink);border:2px solid var(--ink);border-radius:9px 12px 10px 11px;--ink:rgb(31,43,29);--hi:#B6FF2E;--hiFill:rgba(182,255,46,0.4);--onHi:#23241F;background-image:linear-gradient(to right,rgba(63,122,58,.3) 1px,transparent 1px),linear-gradient(to bottom,rgba(63,122,58,.3) 1px,transparent 1px),linear-gradient(#E4F0D8,#D3E5C4);background-size:20px 20px,20px 20px,100% 100%">
+<div style="height:60px;padding-top:20px"><span style="display:inline-block;font-family:Caveat,cursive;font-weight:700;font-size:28px;line-height:40px;letter-spacing:.5px;box-shadow:0 2px 0 var(--ink)">AUG 2026</span></div>
+<div style="height:20px;font-size:12px;line-height:20px;letter-spacing:.4px;opacity:.6">GREEN</div>
+<div style="height:20px"></div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px"><span style="width:20px;text-align:center;font-size:12px">□</span>PLAN SEPT BLOCK</div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px"><span style="width:20px;text-align:center;font-size:12px">□</span>BOOK THE DENTIST</div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px;opacity:.42"><span style="width:20px;text-align:center">✕</span><span style="text-decoration:line-through">CALL MUM BACK</span></div>
+<div style="height:20px"></div>
+<div style="height:20px;display:flex;font-size:16px;line-height:20px;opacity:.85"><span style="width:20px;text-align:center">✕</span><span style="width:20px;text-align:center">×</span><span style="width:20px"></span><span style="width:20px;text-align:center">✗</span><span style="width:20px;text-align:center">✕</span><span style="width:20px"></span></div>
+<div style="height:20px;display:flex;align-items:center;justify-content:space-between;padding-right:20px">
+<span style="margin-left:20px;height:20px;padding:0 10px;border:1.5px solid var(--ink);border-radius:11px 9px 10px 10px;background:var(--hiFill);font-size:11px;line-height:17px">4 OPEN</span>
+<span style="height:17px;padding:0 10px;background:var(--hi);color:var(--onHi);border-radius:9px 6px 10px 7px;transform:rotate(-1deg);font-size:11px;line-height:17px;font-weight:700">HABITS</span>
+</div>
+</div>
+
+<div style="height:240px;position:relative;overflow:hidden;color:var(--ink);border:2px solid var(--ink);border-radius:11px 10px 12px 9px;--ink:rgb(27,40,56);--hi:#B6FF2E;--hiFill:rgba(182,255,46,0.4);--onHi:#23241F;background-image:linear-gradient(to right,rgba(74,127,176,.3) 1px,transparent 1px),linear-gradient(to bottom,rgba(74,127,176,.3) 1px,transparent 1px),linear-gradient(#E3EEF8,#D0E2F2);background-size:20px 20px,20px 20px,100% 100%">
+<div style="height:60px;padding-top:20px"><span style="display:inline-block;font-family:Caveat,cursive;font-weight:700;font-size:28px;line-height:40px;letter-spacing:.5px;box-shadow:0 2px 0 var(--ink)">AUG 2026</span></div>
+<div style="height:20px;font-size:12px;line-height:20px;letter-spacing:.4px;opacity:.6">BLUE</div>
+<div style="height:20px"></div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px"><span style="width:20px;text-align:center;font-size:12px">□</span>PLAN SEPT BLOCK</div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px"><span style="width:20px;text-align:center;font-size:12px">□</span>BOOK THE DENTIST</div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px;opacity:.42"><span style="width:20px;text-align:center">✕</span><span style="text-decoration:line-through">CALL MUM BACK</span></div>
+<div style="height:20px"></div>
+<div style="height:20px;display:flex;font-size:16px;line-height:20px;opacity:.85"><span style="width:20px;text-align:center">✕</span><span style="width:20px;text-align:center">×</span><span style="width:20px"></span><span style="width:20px;text-align:center">✗</span><span style="width:20px;text-align:center">✕</span><span style="width:20px"></span></div>
+<div style="height:20px;display:flex;align-items:center;justify-content:space-between;padding-right:20px">
+<span style="margin-left:20px;height:20px;padding:0 10px;border:1.5px solid var(--ink);border-radius:11px 9px 10px 10px;background:var(--hiFill);font-size:11px;line-height:17px">4 OPEN</span>
+<span style="height:17px;padding:0 10px;background:var(--hi);color:var(--onHi);border-radius:9px 6px 10px 7px;transform:rotate(-1deg);font-size:11px;line-height:17px;font-weight:700">HABITS</span>
+</div>
+</div>
+
+<div style="height:240px;position:relative;overflow:hidden;color:var(--ink);border:2px solid var(--ink);border-radius:10px 11px 9px 12px;--ink:rgb(242,246,255);--hi:#B6FF2E;--hiFill:rgba(182,255,46,0.28);--onHi:#1B1D17;background-image:linear-gradient(to right,rgba(191,216,255,.25) 1px,transparent 1px),linear-gradient(to bottom,rgba(191,216,255,.25) 1px,transparent 1px),linear-gradient(#1E3A6E,#152B55);background-size:20px 20px,20px 20px,100% 100%">
+<div style="height:60px;padding-top:20px"><span style="display:inline-block;font-family:Caveat,cursive;font-weight:700;font-size:28px;line-height:40px;letter-spacing:.5px;box-shadow:0 2px 0 var(--ink)">AUG 2026</span></div>
+<div style="height:20px;font-size:12px;line-height:20px;letter-spacing:.4px;opacity:.6">BLUEPRINT</div>
+<div style="height:20px"></div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px"><span style="width:20px;text-align:center;font-size:12px">□</span>PLAN SEPT BLOCK</div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px"><span style="width:20px;text-align:center;font-size:12px">□</span>BOOK THE DENTIST</div>
+<div style="height:20px;display:flex;align-items:center;font-size:13px;line-height:20px;opacity:.42"><span style="width:20px;text-align:center">✕</span><span style="text-decoration:line-through">CALL MUM BACK</span></div>
+<div style="height:20px"></div>
+<div style="height:20px;display:flex;font-size:16px;line-height:20px;opacity:.85"><span style="width:20px;text-align:center">✕</span><span style="width:20px;text-align:center">×</span><span style="width:20px"></span><span style="width:20px;text-align:center">✗</span><span style="width:20px;text-align:center">✕</span><span style="width:20px"></span></div>
+<div style="height:20px;display:flex;align-items:center;justify-content:space-between;padding-right:20px">
+<span style="margin-left:20px;height:20px;padding:0 10px;border:1.5px solid var(--ink);border-radius:11px 9px 10px 10px;background:var(--hiFill);font-size:11px;line-height:17px">4 OPEN</span>
+<span style="height:17px;padding:0 10px;background:var(--hi);color:var(--onHi);border-radius:9px 6px 10px 7px;transform:rotate(-1deg);font-size:11px;line-height:17px;font-weight:700">HABITS</span>
+</div>
+</div>
+
+</div>
+
+<div style="margin-top:20px;height:20px;display:flex;align-items:flex-end;gap:8px"><span style="font-size:17px;line-height:20px;letter-spacing:1.2px;box-shadow:0 2px 0 #23241F">HIGHLIGHTER MARKERS</span><span style="font-size:12px;line-height:20px;opacity:.55">TAG EACH HABIT COLUMN</span></div>
+<div style="margin-top:20px;display:flex;gap:12px">
+<span class="mk" style="width:92px;background:#B6FF2E;border-radius:4px 3px 5px 3px">LIME</span><span class="mk" style="width:92px;background:#FFE156;border-radius:3px 5px 3px 4px">YELLOW</span><span class="mk" style="width:92px;background:#FF9F45;border-radius:4px 3px 5px 3px">ORANGE</span><span class="mk" style="width:92px;background:#FF6B9D;border-radius:3px 5px 3px 4px">PINK</span><span class="mk" style="width:92px;background:#5CD6FF;border-radius:4px 3px 5px 3px">SKY</span><span class="mk" style="width:92px;background:#8C7BFF;border-radius:3px 5px 3px 4px">VIOLET</span><span class="mk" style="width:92px;background:#4DDFC0;border-radius:4px 3px 5px 3px">TEAL</span><span class="mk" style="width:92px;background:#FF6B6B;border-radius:3px 5px 3px 4px">CORAL</span>
+</div>
+
+</div>
+</div></section>
+</main>
+<script>
+const TH={light:['#FDFCF8','#F1EFE8','35,36,31','rgba(96,98,72,.2)',0],dark:['#24261F','#191B16','240,234,214','rgba(214,226,178,.16)',1],oldPaper:['#F3E4B8','#E6D3A0','58,46,26','rgba(139,107,46,.25)',0],legalPad:['#FBF3A5','#F2E88A','31,42,68','rgba(74,128,192,.33)',0],kraft:['#D9BC8C','#C8A874','43,33,24','rgba(90,65,38,.25)',0],engineering:['#E4F0D8','#D3E5C4','31,43,29','rgba(63,122,58,.3)',0],sky:['#E3EEF8','#D0E2F2','27,40,56','rgba(74,127,176,.3)',0],blueprint:['#1E3A6E','#152B55','242,246,255','rgba(191,216,255,.25)',1]};
+const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)).join(',');
+document.getElementById('paper').addEventListener('change',e=>{
+  const t=TH[e.target.value],d=t[4],a=x=>'rgba('+t[2]+','+x+')';
+  const v={'--p1':t[0],'--p2':t[1],'--ink':'rgb('+t[2]+')','--i65':a(d?.62:.65),'--i60':a(d?.55:.6),'--i50':a(d?.45:.5),'--i40':a(d?.35:.4),'--i30':a(d?.25:.3),'--grid':t[3],'--hiFill':'rgba(182,255,46,'+(d?.28:.4)+')','--hiSoft':'rgba(182,255,46,'+(d?.16:.26)+')','--onHi':d?'#1B1D17':'#23241F','--barA':'rgba('+rgb(t[0])+',.5)','--barB':'rgba('+rgb(t[1])+',.95)'};
+  document.querySelectorAll('[style*="--p1"]').forEach(el=>{for(const k in v)el.style.setProperty(k,v[k]);});
+});</script>
+</body></html>

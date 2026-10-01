@@ -156,16 +156,21 @@ class SleepScreen extends StatelessWidget {
             CalloutCard(
               rotationDeg: -.6,
               line1: '${month.shortName} ${sel.day} · ${sel.hours}H · SCORE ${sel.score}',
-              line2: sel.hours >= 8
-                  ? 'SOLID NIGHT. WOKE UP EASY.'
-                  : sel.hours >= 7
-                      ? 'DECENT. COULD GO TO BED EARLIER.'
-                      : 'SHORT ONE — LATE EDIT SESSION.',
+              line2: sel.imported
+                  ? 'SYNCED FROM YOUR WATCH · HOLD TO EDIT'
+                  : sel.hours >= 8
+                      ? 'SOLID NIGHT. WOKE UP EASY.'
+                      : sel.hours >= 7
+                          ? 'DECENT. COULD GO TO BED EARLIER.'
+                          : 'SHORT ONE — LATE EDIT SESSION.',
             )
           else
             Padding(
               padding: const EdgeInsets.only(top: 20),
-              child: Text('TAP A NIGHT TO LOG YOUR SLEEP',
+              child: Text(
+                  app.sleepSyncEnabled
+                      ? 'NIGHTS FILL IN FROM YOUR WATCH · TAP ONE TO ADD IT YOURSELF'
+                      : 'TAP A NIGHT TO LOG YOUR SLEEP · OR CONNECT A WATCH IN PROFILE',
                   style: PaperText.body(t.ink).copyWith(fontSize: 13, color: t.ink.withValues(alpha: t.ink.a * .4))),
             ),
         ],

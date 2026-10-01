@@ -1,5 +1,7 @@
 package com.prateekmishra.journaling_habits
 
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 
-class MainActivity : FlutterActivity()
+// FlutterFragmentActivity (not FlutterActivity) so the Health Connect
+// permission sheet can be launched for the sleep-sync feature.
+class MainActivity : FlutterFragmentActivity()

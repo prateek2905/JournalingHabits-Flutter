@@ -11,6 +11,7 @@ import '../widgets/header_nav.dart';
 import '../widgets/paper_page.dart';
 import '../widgets/profile_icon.dart';
 import '../widgets/section_header.dart';
+import '../widgets/sleep_watch_sheet.dart';
 import 'progress_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -109,6 +110,7 @@ class ProfileScreen extends StatelessWidget {
                     style: PaperText.body(t.ink).copyWith(fontSize: 13, color: t.ink.withValues(alpha: t.ink.a * .6))),
                 const _ThemeRow(),
                 const _PaperStyleRow(),
+                const _SleepWatchRow(),
                 for (var i = 0; i < defaultSettingLabels.length; i++)
                   _SettingRow(index: i),
               ],
@@ -280,6 +282,36 @@ class _SettingRow extends StatelessWidget {
             SizedBox(width: 20, child: Text(on ? '✕' : '', textAlign: TextAlign.center, style: PaperText.body(t.ink).copyWith(fontSize: 15))),
             const SizedBox(width: 8),
             Text(defaultSettingLabels[index], style: PaperText.body(t.ink)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Opens the sleep-watch connection sheet; shows connection status inline.
+class _SleepWatchRow extends StatelessWidget {
+  const _SleepWatchRow();
+
+  @override
+  Widget build(BuildContext context) {
+    final app = context.watch<AppState>();
+    final t = context.paper;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => showSleepWatchSheet(context),
+      child: SizedBox(
+        height: 20,
+        child: Row(
+          children: [
+            Text('SLEEP WATCH', style: PaperText.body(t.ink)),
+            const SizedBox(width: 8),
+            Expanded(child: DottedLine(color: t.ink30)),
+            const SizedBox(width: 8),
+            Text(
+              sleepWatchStatus(app),
+              style: PaperText.body(t.ink).copyWith(fontWeight: app.sleepSyncEnabled ? FontWeight.w700 : FontWeight.w400),
+            ),
           ],
         ),
       ),

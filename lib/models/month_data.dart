@@ -40,14 +40,25 @@ class SleepNight {
   double hours;
   int score;
 
-  SleepNight({required this.day, required this.hours, required this.score});
+  /// True when this night was filled in from the user's watch/band rather than
+  /// typed in. Auto-sync refreshes imported nights but never overwrites one the
+  /// user entered or corrected by hand.
+  final bool imported;
 
-  Map<String, dynamic> toJson() => {'day': day, 'hours': hours, 'score': score};
+  SleepNight({required this.day, required this.hours, required this.score, this.imported = false});
+
+  Map<String, dynamic> toJson() => {
+        'day': day,
+        'hours': hours,
+        'score': score,
+        if (imported) 'imported': true,
+      };
 
   factory SleepNight.fromJson(Map json) => SleepNight(
         day: json['day'] as int,
         hours: (json['hours'] as num).toDouble(),
         score: json['score'] as int,
+        imported: json['imported'] as bool? ?? false,
       );
 
   /// Deterministic score from hours slept — mirrors the design prototype's

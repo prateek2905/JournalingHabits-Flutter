@@ -35,6 +35,8 @@
 			</array>
 		</dict>
 	</array>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Journaling Habits reads only your sleep from Apple Health, so your sleep page fills in automatically from your Apple Watch or band. Nothing else is read, and nothing leaves your phone.</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>

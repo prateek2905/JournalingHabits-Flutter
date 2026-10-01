@@ -27,7 +27,7 @@ class HabitsScreen extends StatelessWidget {
     final month = app.habitsMonth;
     final mo = app.monthAt(month);
     final isCurrent = app.monthAtToday(month);
-    final showWeight = app.settingsFlags[3];
+    final showWeight = app.settingsFlags[2];
 
     final subNote = isCurrent
         ? 'DAY ${app.todayDay} · IN PROGRESS'

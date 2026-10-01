@@ -3,15 +3,20 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' show Color;
+import 'package:flutter/widgets.dart' show AppLifecycleState, WidgetsBinding, WidgetsBindingObserver;
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../models/month_cursor.dart';
 import '../theme/paper_painter.dart' show PaperStyle;
 import '../theme/paper_tokens.dart' show PaperTheme;
+import '../services/sleep_sync.dart';
 import '../services/widget_sync.dart';
 import '../models/month_data.dart';
 
 enum AppTab { journal, habits, sleep, profile }
+
+/// Outcome of asking to connect a watch/band, so the UI can say what to do next.
+enum SleepConnectResult { connected, needsHealthConnect, unsupported, declined, failed }
 
 const defaultHabits = [
   'COLD EXPOSURE', 'EXERCISE', 'STRETCHING', 'NO PHONE AM', 'MEDITATION',
@@ -21,11 +26,10 @@ const defaultHabits = [
 const defaultSettingLabels = [
   'NIGHTLY REMINDER 9:30PM',
   'WEEK STARTS MONDAY',
-  'SYNC SLEEP FROM RING',
   'SHOW WEIGHT COLUMN',
 ];
 
-class AppState extends ChangeNotifier {
+class AppState extends ChangeNotifier with WidgetsBindingObserver {
   static const _boxName = 'journaling_habits';
   static const _stateKey = 'state';
 
@@ -49,9 +53,16 @@ class AppState extends ChangeNotifier {
   PaperTheme theme = PaperTheme.light;
   bool get dark => theme.isDark;
   PaperStyle paperStyle = PaperStyle.grid;
-  List<bool> settingsFlags = [true, true, true, false];
+  List<bool> settingsFlags = [true, true, false];
   String userName = 'YOU';
   late MonthCursor installMonth;
+
+  // Sleep sync (Apple Health / Health Connect). Off until the user connects.
+  bool sleepSyncEnabled = false;
+  DateTime? lastSleepSync;
+  bool sleepSyncing = false;
+  bool sleepSyncFailed = false;
+  DateTime? _lastSleepAttempt;
 
   late final MonthCursor _todayCursor;
   late final int _todayDay;
@@ -78,6 +89,21 @@ class AppState extends ChangeNotifier {
     unawaited(WidgetSync.update(this));
     _ready = true;
     notifyListeners();
+    WidgetsBinding.instance.addObserver(this);
+    unawaited(syncSleep());
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _saveDebounce?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Pick up last night's sleep whenever the app comes back to the front.
+    if (state == AppLifecycleState.resumed) unawaited(syncSleep());
   }
 
   void _load() {
@@ -97,7 +123,13 @@ class AppState extends ChangeNotifier {
       }
       theme = PaperTheme.fromName(json['theme'] as String?, legacyDark: json['dark'] as bool? ?? false);
       paperStyle = PaperStyle.fromName(json['paperStyle'] as String?);
-      settingsFlags = ((json['settingsFlags'] as List?) ?? settingsFlags).cast<bool>();
+      settingsFlags = ((json['settingsFlags'] as List?) ?? settingsFlags).cast<bool>().toList();
+      // Older builds had a placeholder "SYNC SLEEP FROM RING" toggle at index 2;
+      // it's replaced by the real watch connection below.
+      if (settingsFlags.length == 4) settingsFlags.removeAt(2);
+      sleepSyncEnabled = json['sleepSyncEnabled'] as bool? ?? false;
+      final lastSync = json['lastSleepSync'] as int?;
+      lastSleepSync = lastSync == null ? null : DateTime.fromMillisecondsSinceEpoch(lastSync);
       userName = json['userName'] as String? ?? userName;
       if (json['installMonth'] != null) {
         installMonth = MonthCursor.fromKey(json['installMonth'] as String);
@@ -137,6 +169,8 @@ class AppState extends ChangeNotifier {
       'theme': theme.name,
       'paperStyle': paperStyle.name,
       'settingsFlags': settingsFlags,
+      'sleepSyncEnabled': sleepSyncEnabled,
+      'lastSleepSync': lastSleepSync?.millisecondsSinceEpoch,
       'userName': userName,
       'installMonth': installMonth.key,
       'journalMonth': journalMonth.key,
@@ -319,6 +353,82 @@ class AppState extends ChangeNotifier {
   void selectNight(int day) {
     selectedNightDay = day;
     _touch();
+  }
+
+  /// Asks the OS for read-only access to sleep data and, if granted, turns on
+  /// automatic syncing and pulls the last few weeks.
+  Future<SleepConnectResult> connectSleepSource() async {
+    try {
+      switch (await SleepSync.status()) {
+        case SleepSourceStatus.unsupported:
+          return SleepConnectResult.unsupported;
+        case SleepSourceStatus.needsHealthConnect:
+          return SleepConnectResult.needsHealthConnect;
+        case SleepSourceStatus.ready:
+          break;
+      }
+      if (!await SleepSync.requestAccess()) return SleepConnectResult.declined;
+      sleepSyncEnabled = true;
+      lastSleepSync = null; // first sync after (re)connecting looks back the full window
+      _touch();
+      await syncSleep(force: true);
+      return sleepSyncFailed ? SleepConnectResult.failed : SleepConnectResult.connected;
+    } catch (e) {
+      debugPrint('AppState: connecting sleep source failed: $e');
+      return SleepConnectResult.failed;
+    }
+  }
+
+  /// Stops syncing and, where the platform allows, releases the OS permission.
+  /// Nights already imported stay in the journal.
+  Future<void> disconnectSleepSource() async {
+    sleepSyncEnabled = false;
+    lastSleepSync = null;
+    sleepSyncFailed = false;
+    _touch();
+    try {
+      await SleepSync.revokeAccess();
+    } catch (e) {
+      debugPrint('AppState: revoking sleep access failed: $e');
+    }
+  }
+
+  /// Pulls recent nights from the health platform into the sleep grid. Safe to
+  /// call often: it's a no-op when not connected, already running, or (unless
+  /// [force]) run within the last 10 minutes.
+  Future<void> syncSleep({bool force = false}) async {
+    if (!sleepSyncEnabled || sleepSyncing) return;
+    final now = DateTime.now();
+    final last = _lastSleepAttempt;
+    if (!force && last != null && now.difference(last) < const Duration(minutes: 10)) return;
+    _lastSleepAttempt = now;
+
+    sleepSyncing = true;
+    sleepSyncFailed = false;
+    notifyListeners();
+    try {
+      // Re-read a few days back too: watches often upload a night late.
+      final since = lastSleepSync == null
+          ? now.subtract(SleepSync.maxLookback)
+          : lastSleepSync!.subtract(const Duration(days: 3));
+      final nights = await SleepSync.fetch(since: since);
+      final today = DateTime(now.year, now.month, now.day);
+      nights.forEach((date, hours) {
+        if (date.isAfter(today)) return; // evening sleep that hasn't ended yet
+        final mo = monthAt(MonthCursor.fromDate(date));
+        final existing = mo.nights[date.day];
+        if (existing != null && !existing.imported) return; // never clobber a hand-entered night
+        mo.nights[date.day] =
+            SleepNight(day: date.day, hours: hours, score: SleepNight.scoreFor(hours), imported: true);
+      });
+      lastSleepSync = DateTime.now();
+    } catch (e) {
+      debugPrint('AppState: sleep sync failed: $e');
+      sleepSyncFailed = true;
+    } finally {
+      sleepSyncing = false;
+      _touch();
+    }
   }
 
   // ---- Profile / settings ----
